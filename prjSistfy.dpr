@@ -1,0 +1,18 @@
+program prjSistfy;
+
+{$APPTYPE CONSOLE}
+
+{$R *.res}
+
+uses Horse;
+
+procedure PingHandler(Req: THorseRequest; Res: THorseResponse);
+begin
+  Res.Send('pong');
+end;
+
+begin
+  THorse.Get('/ping', PingHandler);
+
+  THorse.Listen(9000);
+end.
