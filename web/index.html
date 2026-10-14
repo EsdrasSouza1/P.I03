@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142b4a">
+  <meta name="description" content="Acesse sua área financeira Sistfy.">
+  <title>Entrar | Sistfy</title>
+  <link href="/styles.css" rel="stylesheet">
+</head>
+<body>
+  <main class="login-layout container-fluid">
+    <section class="brand-panel" aria-label="Sobre o Sistfy">
+      <a class="brand" href="/" aria-label="Sistfy, página inicial">
+        <span class="brand-mark" aria-hidden="true">s</span>
+        <span>Sistfy</span>
+      </a>
+      <div class="brand-copy">
+        <span class="eyebrow">Sua vida financeira, mais clara</span>
+        <h1>Suas escolhas de hoje constroem seus planos de amanhã.</h1>
+        <p>Organize suas contas, acompanhe seus objetivos e tenha mais tranquilidade para cuidar do seu dinheiro.</p>
+      </div>
+      <div class="brand-foot"><span class="status-dot"></span> Um passo de cada vez.</div>
+      <div class="decor decor-one" aria-hidden="true"></div>
+      <div class="decor decor-two" aria-hidden="true"></div>
+    </section>
+
+    <section class="form-panel" aria-labelledby="login-title">
+      <div class="login-card">
+        <div class="mobile-brand brand" aria-hidden="true"><span class="brand-mark">s</span><span>Sistfy</span></div>
+        <div class="welcome">
+          <span class="eyebrow">Bem-vindo de volta</span>
+          <h2 id="login-title">Acesse sua conta</h2>
+          <p>Entre com seus dados para continuar.</p>
+        </div>
+
+        <form id="login-form" novalidate>
+          <div class="field-group">
+            <label for="email" class="field-label">E-mail</label>
+            <input id="email" name="email" class="field-input" type="email" placeholder="voce@exemplo.com" autocomplete="email" required aria-describedby="email-error">
+            <div class="field-error" id="email-error">Informe um e-mail válido.</div>
+          </div>
+          <div class="field-group">
+            <div class="password-label">
+              <label for="password" class="field-label">Senha</label>
+              <a class="text-link" href="#" id="forgot-link">Esqueceu a senha?</a>
+            </div>
+            <div class="password-wrap">
+              <input id="password" name="password" class="field-input" type="password" placeholder="Digite sua senha" autocomplete="current-password" required minlength="8" aria-describedby="password-error">
+              <button class="password-toggle" type="button" id="toggle-password" aria-label="Mostrar senha">Mostrar</button>
+            </div>
+            <div class="field-error" id="password-error">A senha deve ter pelo menos 8 caracteres.</div>
+          </div>
+          <div class="form-alert" id="form-alert" role="alert" aria-live="polite"></div>
+          <button class="submit-button" type="submit">Entrar <span aria-hidden="true">→</span></button>
+          <p class="signup-note">Ainda não tem uma conta? <a class="text-link" href="/cadastro">Criar cadastro</a></p>
+        </form>
+        <p class="security-note"><span aria-hidden="true">◈</span> Seus dados são protegidos e só você tem acesso.</p>
+      </div>
+      <footer class="page-footer">Sistfy <span>·</span> Seu espaço para organizar as finanças.</footer>
+    </section>
+  </main>
+  <script src="/login.js" defer></script>
+</body>
+</html>

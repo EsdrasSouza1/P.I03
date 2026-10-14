@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142b4a">
+  <title>Visão geral | Sistfy</title>
+  <link href="/styles.css" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+  <header class="dashboard-header">
+    <a class="brand dashboard-brand" href="/dashboard"><span class="brand-mark">s</span><span>Sistfy</span></a>
+    <div class="user-menu"><span class="avatar">D</span><span>Conta de demonstração</span><button id="logout-button" class="logout-button" type="button">Sair</button></div>
+  </header>
+  <main class="dashboard-main">
+    <div class="dashboard-heading"><div><span class="eyebrow">Visão geral</span><h1>Suas finanças em um só lugar</h1><p>Aqui está um resumo das suas finanças.</p></div><span class="demo-badge"><span></span> Dados de demonstração</span></div>
+    <section class="summary-grid" aria-label="Resumo financeiro">
+      <article class="summary-card balance-card"><div class="card-topline"><span>Saldo total</span><span class="card-icon">◉</span></div><strong>R$ 8.420,50</strong><small>Em todas as contas</small></article>
+      <article class="summary-card"><div class="card-topline"><span>Receitas do mês</span><span class="card-icon green-icon">↗</span></div><strong>R$ 5.800,00</strong><small class="positive-text">↑ 8,2% em relação ao mês passado</small></article>
+      <article class="summary-card"><div class="card-topline"><span>Despesas do mês</span><span class="card-icon red-icon">↘</span></div><strong>R$ 3.240,75</strong><small>Até agora neste mês</small></article>
+      <article class="summary-card"><div class="card-topline"><span>Economia mensal</span><span class="card-icon green-icon">✳</span></div><strong>R$ 2.559,25</strong><small>44% da sua receita</small></article>
+    </section>
+    <section class="dashboard-lower">
+      <article class="dashboard-panel"><div class="panel-heading"><div><h2>Movimentações recentes</h2><p>Suas últimas atividades financeiras</p></div><button class="view-all-button" type="button">Ver todas <span>→</span></button></div>
+        <div class="transaction-list">
+          <div class="transaction-row"><span class="transaction-icon expense-icon">⌂</span><span class="transaction-name"><strong>Aluguel</strong><small>Moradia · Hoje, 09:15</small></span><strong class="amount expense-amount">− R$ 1.500,00</strong></div>
+          <div class="transaction-row"><span class="transaction-icon income-icon">↙</span><span class="transaction-name"><strong>Salário</strong><small>Renda · 05 Out, 08:30</small></span><strong class="amount income-amount">+ R$ 5.200,00</strong></div>
+          <div class="transaction-row"><span class="transaction-icon expense-icon">▤</span><span class="transaction-name"><strong>Mercado</strong><small>Alimentação · 04 Out, 18:42</small></span><strong class="amount expense-amount">− R$ 386,40</strong></div>
+          <div class="transaction-row"><span class="transaction-icon expense-icon">⌁</span><span class="transaction-name"><strong>Internet</strong><small>Serviços · 03 Out, 14:10</small></span><strong class="amount expense-amount">− R$ 119,90</strong></div>
+        </div>
+      </article>
+      <article class="dashboard-panel goal-panel"><div class="panel-heading"><div><h2>Meta de economia</h2><p>Viagem de férias</p></div><span class="goal-icon">◎</span></div><div class="goal-amount"><strong>R$ 3.600</strong><span>de R$ 6.000</span></div><div class="progress-track"><span></span></div><div class="goal-meta"><span>60% concluído</span><span>Faltam R$ 2.400</span></div><div class="goal-tip"><span>✦</span><p>Você está no caminho certo. Mantendo esse ritmo, alcançará sua meta em 3 meses.</p></div></article>
+    </section>
+    <p class="demo-disclaimer">Este painel usa valores fictícios para demonstração. Nenhum dado financeiro foi armazenado.</p>
+  </main>
+  <script src="/dashboard.js" defer></script>
+</body>
+</html>
