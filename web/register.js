@@ -54,7 +54,7 @@ form.addEventListener('submit', async (event) => {
       alertBox.classList.add('visible');
       return;
     }
-    window.location.assign('/?registered=1');
+    window.location.assign('/entrar?registered=1');
   } catch {
     alertBox.textContent = 'Não foi possível conectar ao servidor local.';
     alertBox.classList.add('visible');

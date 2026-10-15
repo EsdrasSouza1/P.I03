@@ -3,36 +3,88 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#142b4a">
-  <title>Visão geral | Sistfy</title>
+  <meta name="theme-color" content="#edf6ff">
+  <meta name="description" content="Seu espaço de leitura no Mybook.">
+  <title>Feed | Mybook</title>
   <link href="/styles.css" rel="stylesheet">
+  <link href="/mybook.css" rel="stylesheet">
 </head>
-<body class="dashboard-page">
-  <header class="dashboard-header">
-    <a class="brand dashboard-brand" href="/dashboard"><span class="brand-mark">s</span><span>Sistfy</span></a>
-    <div class="user-menu"><span class="avatar">D</span><span>Conta de demonstração</span><button id="logout-button" class="logout-button" type="button">Sair</button></div>
+<body class="dashboard-page mybook-page">
+  <header class="app-topbar">
+    <a class="brand dashboard-brand" href="/dashboard" aria-label="Mybook, início"><span class="brand-mark">m</span><span>mybook</span></a>
+    <span class="topbar-center">Seu espaço de leitura</span>
+    <div class="topbar-actions">
+      <button id="add-book-button" class="topbar-create" type="button" aria-haspopup="dialog" aria-controls="add-book-dialog"><span aria-hidden="true">＋</span> Adicionar livro</button>
+      <a class="topbar-user account-link" href="/dashboard?tab=profile" data-tab="profile"><span class="avatar" aria-hidden="true">◉</span><span class="topbar-user-name">Minha conta</span></a>
+      <button id="logout-button" class="logout-button" type="button">Sair</button>
+    </div>
   </header>
-  <main class="dashboard-main">
-    <div class="dashboard-heading"><div><span class="eyebrow">Visão geral</span><h1>Suas finanças em um só lugar</h1><p>Aqui está um resumo das suas finanças.</p></div><span class="demo-badge"><span></span> Dados de demonstração</span></div>
-    <section class="summary-grid" aria-label="Resumo financeiro">
-      <article class="summary-card balance-card"><div class="card-topline"><span>Saldo total</span><span class="card-icon">◉</span></div><strong>R$ 8.420,50</strong><small>Em todas as contas</small></article>
-      <article class="summary-card"><div class="card-topline"><span>Receitas do mês</span><span class="card-icon green-icon">↗</span></div><strong>R$ 5.800,00</strong><small class="positive-text">↑ 8,2% em relação ao mês passado</small></article>
-      <article class="summary-card"><div class="card-topline"><span>Despesas do mês</span><span class="card-icon red-icon">↘</span></div><strong>R$ 3.240,75</strong><small>Até agora neste mês</small></article>
-      <article class="summary-card"><div class="card-topline"><span>Economia mensal</span><span class="card-icon green-icon">✳</span></div><strong>R$ 2.559,25</strong><small>44% da sua receita</small></article>
-    </section>
-    <section class="dashboard-lower">
-      <article class="dashboard-panel"><div class="panel-heading"><div><h2>Movimentações recentes</h2><p>Suas últimas atividades financeiras</p></div><button class="view-all-button" type="button">Ver todas <span>→</span></button></div>
-        <div class="transaction-list">
-          <div class="transaction-row"><span class="transaction-icon expense-icon">⌂</span><span class="transaction-name"><strong>Aluguel</strong><small>Moradia · Hoje, 09:15</small></span><strong class="amount expense-amount">− R$ 1.500,00</strong></div>
-          <div class="transaction-row"><span class="transaction-icon income-icon">↙</span><span class="transaction-name"><strong>Salário</strong><small>Renda · 05 Out, 08:30</small></span><strong class="amount income-amount">+ R$ 5.200,00</strong></div>
-          <div class="transaction-row"><span class="transaction-icon expense-icon">▤</span><span class="transaction-name"><strong>Mercado</strong><small>Alimentação · 04 Out, 18:42</small></span><strong class="amount expense-amount">− R$ 386,40</strong></div>
-          <div class="transaction-row"><span class="transaction-icon expense-icon">⌁</span><span class="transaction-name"><strong>Internet</strong><small>Serviços · 03 Out, 14:10</small></span><strong class="amount expense-amount">− R$ 119,90</strong></div>
+
+  <div class="workspace-shell">
+    <aside class="sidebar mybook-sidebar" aria-label="Navegação principal">
+      <div class="sidebar-section-label">MENU</div>
+      <nav class="sidebar-nav" aria-label="Áreas do Mybook">
+        <a class="sidebar-link" href="/dashboard?tab=feed" data-tab="feed"><span class="nav-glyph">⌂</span><span>Feed</span></a>
+        <a class="sidebar-link" href="/dashboard?tab=library" data-tab="library"><span class="nav-glyph">▤</span><span>Minha Biblioteca</span></a>
+        <a class="sidebar-link" href="/dashboard?tab=books" data-tab="books"><span class="nav-glyph">▧</span><span>Livros</span></a>
+        <a class="sidebar-link" href="/dashboard?tab=agora" data-tab="agora"><span class="nav-glyph">✳</span><span>Ágora do Livro</span></a>
+        <a class="sidebar-link" href="/dashboard?tab=recommendations" data-tab="recommendations"><span class="nav-glyph">✦</span><span>Recomendações</span></a>
+        <a class="sidebar-link" href="/dashboard?tab=store" data-tab="store"><span class="nav-glyph">⌑</span><span>Loja</span></a>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">CONTA</div>
+      <nav class="sidebar-nav"><a class="sidebar-link" href="/dashboard?tab=profile" data-tab="profile"><span class="nav-glyph">◉</span><span>Meu perfil</span></a><button class="sidebar-link sidebar-logout" type="button" data-logout><span class="nav-glyph">↪</span><span>Sair da conta</span></button></nav>
+      <div class="sidebar-bottom"><span class="sidebar-help-icon">✦</span><span><strong>Comece no seu ritmo</strong><small>Seu espaço está pronto para começar.</small></span></div>
+    </aside>
+
+    <main class="workspace-main mybook-main">
+      <section class="mybook-empty-state" aria-labelledby="view-title">
+        <div class="empty-state-copy">
+          <span class="eyebrow" id="view-eyebrow">MYBOOK · FEED</span>
+          <h1 id="view-title">Seu feed começa aqui.</h1>
+          <p id="view-description">Ainda não há publicações. Quando você e outras pessoas começarem a compartilhar leituras, elas vão aparecer neste espaço.</p>
+          <a id="view-action" class="empty-state-action" href="/dashboard?tab=books" data-tab="books">Conhecer a área de livros <span aria-hidden="true">→</span></a>
         </div>
-      </article>
-      <article class="dashboard-panel goal-panel"><div class="panel-heading"><div><h2>Meta de economia</h2><p>Viagem de férias</p></div><span class="goal-icon">◎</span></div><div class="goal-amount"><strong>R$ 3.600</strong><span>de R$ 6.000</span></div><div class="progress-track"><span></span></div><div class="goal-meta"><span>60% concluído</span><span>Faltam R$ 2.400</span></div><div class="goal-tip"><span>✦</span><p>Você está no caminho certo. Mantendo esse ritmo, alcançará sua meta em 3 meses.</p></div></article>
-    </section>
-    <p class="demo-disclaimer">Este painel usa valores fictícios para demonstração. Nenhum dado financeiro foi armazenado.</p>
-  </main>
+        <div class="empty-state-art" aria-hidden="true">
+          <span class="empty-orbit empty-orbit-one"></span><span class="empty-orbit empty-orbit-two"></span>
+          <div class="empty-book empty-book-back"></div><div class="empty-book empty-book-front"><span>SEU<br>PRÓXIMO<br>CAPÍTULO</span><i></i></div>
+          <span class="empty-spark empty-spark-one">✦</span><span class="empty-spark empty-spark-two">✳</span>
+        </div>
+      </section>
+      <section id="library-book-list" class="library-book-list" aria-label="Livros na minha biblioteca" hidden></section>
+      <p class="empty-state-footnote">Tudo começa vazio. Vamos construir o Mybook aos poucos.</p>
+    </main>
+  </div>
+
+  <nav class="mobile-nav mybook-mobile-nav" aria-label="Navegação móvel">
+    <a class="mobile-nav-link" href="/dashboard?tab=feed" data-tab="feed"><span>⌂</span><small>Feed</small></a>
+    <a class="mobile-nav-link" href="/dashboard?tab=library" data-tab="library"><span>▤</span><small>Biblioteca</small></a>
+    <a class="mobile-nav-link" href="/dashboard?tab=books" data-tab="books"><span>▧</span><small>Livros</small></a>
+    <button id="add-book-mobile" class="mobile-nav-add" type="button" aria-label="Adicionar livro" aria-haspopup="dialog" aria-controls="add-book-dialog">＋</button>
+    <a class="mobile-nav-link" href="/dashboard?tab=agora" data-tab="agora"><span>✳</span><small>Ágora</small></a>
+    <a class="mobile-nav-link" href="/dashboard?tab=recommendations" data-tab="recommendations"><span>✦</span><small>Indicações</small></a>
+    <a class="mobile-nav-link" href="/dashboard?tab=store" data-tab="store"><span>⌑</span><small>Loja</small></a>
+    <a class="mobile-nav-link" href="/dashboard?tab=profile" data-tab="profile"><span>◉</span><small>Perfil</small></a>
+  </nav>
+  <dialog id="add-book-dialog" class="book-dialog" aria-labelledby="add-book-title">
+    <form id="add-book-form" class="book-dialog-form">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Fechar">×</button>
+      <span class="eyebrow">MINHA BIBLIOTECA</span>
+      <h2 id="add-book-title">Adicionar um livro</h2>
+      <p>Comece registrando um título na sua estante.</p>
+      <label for="book-title">Título</label>
+      <input id="book-title" name="title" type="text" placeholder="Ex.: As 48 Leis do Poder" required maxlength="120">
+      <label for="book-author">Autor</label>
+      <input id="book-author" name="author" type="text" placeholder="Nome do autor" required maxlength="100">
+      <label for="book-status">Status de leitura</label>
+      <select id="book-status" name="status" required>
+        <option value="quero-ler">Quero ler</option>
+        <option value="lendo">Estou lendo</option>
+        <option value="lido">Já li</option>
+      </select>
+      <div class="dialog-actions"><button type="button" class="dialog-cancel" data-close-dialog>Cancelar</button><button type="submit" class="dialog-submit">Adicionar à biblioteca</button></div>
+    </form>
+  </dialog>
   <script src="/dashboard.js" defer></script>
 </body>
 </html>

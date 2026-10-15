@@ -47,10 +47,11 @@ func main() {
 	mux.HandleFunc("/api/login", loginHandler)
 	mux.HandleFunc("/api/register", registerHandler)
 	mux.HandleFunc("/api/logout", logoutHandler)
+	mux.HandleFunc("/entrar", serveHTML("login.html"))
 	mux.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("sistfy_demo")
+		cookie, err := r.Cookie("mybook_demo")
 		if err != nil || cookie.Value != "authenticated" {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.Redirect(w, r, "/entrar", http.StatusSeeOther)
 			return
 		}
 		serveHTML("dashboard.html")(w, r)
@@ -58,7 +59,7 @@ func main() {
 	mux.HandleFunc("/cadastro", serveHTML("register.html"))
 	mux.Handle("/", fileServer)
 
-	log.Println("Sistfy disponível em http://localhost:8080")
+	log.Println("Mybook disponível em http://localhost:8080")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +71,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name: "sistfy_demo", Value: "", Path: "/", MaxAge: -1,
+		Name: "mybook_demo", Value: "", Path: "/", MaxAge: -1,
 		HttpOnly: true, SameSite: http.SameSiteLaxMode,
 	})
 	w.WriteHeader(http.StatusNoContent)
@@ -93,7 +94,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := strings.ToLower(strings.TrimSpace(credentials.Email))
-	validCredentials := email == "demo@sistfy.com" && credentials.Password == "sistfy123"
+	validCredentials := false
 	demoUsers.RLock()
 	user, exists := demoUsers.users[email]
 	demoUsers.RUnlock()
@@ -106,7 +107,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name: "sistfy_demo", Value: "authenticated", Path: "/",
+		Name: "mybook_demo", Value: "authenticated", Path: "/",
 		HttpOnly: true, SameSite: http.SameSiteLaxMode,
 	})
 	w.WriteHeader(http.StatusOK)
@@ -142,10 +143,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	demoUsers.Lock()
 	defer demoUsers.Unlock()
-	if input.Email == "demo@sistfy.com" {
-		http.Error(w, "Esse e-mail já está em uso.", http.StatusConflict)
-		return
-	}
 	if _, exists := demoUsers.users[input.Email]; exists {
 		http.Error(w, "Esse e-mail já está cadastrado neste servidor.", http.StatusConflict)
 		return

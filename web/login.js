@@ -1,7 +1,13 @@
 const form = document.querySelector('#login-form');
+if (form) {
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
 const alertBox = document.querySelector('#form-alert');
+
+if (new URLSearchParams(window.location.search).get('registered') === '1') {
+  alertBox.textContent = 'Cadastro criado. Entre com seu e-mail e senha.';
+  alertBox.classList.add('visible');
+}
 
 function validateEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -65,6 +71,7 @@ form.addEventListener('submit', async (event) => {
 
 document.querySelector('#forgot-link').addEventListener('click', (event) => {
   event.preventDefault();
-  alertBox.textContent = 'A recuperação de senha será disponibilizada quando a autenticação for integrada.';
+  alertBox.textContent = 'A recuperação de senha ainda não está disponível nesta versão.';
   alertBox.classList.add('visible');
 });
+}
