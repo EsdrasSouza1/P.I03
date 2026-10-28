@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f3">
+  <title>Gestão de imóveis — Bartarin Imóveis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a href="/">Ver portal ↗</a></nav><span class="admin-label">ÁREA DE GESTÃO · DESENVOLVIMENTO</span></header>
+  <main class="admin-page">
+    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE IMÓVEIS</div><h1>Gerencie seus <em>espaços.</em></h1><p>Cadastre imóveis e informe os detalhes próprios de cada categoria.</p></div><span class="connection-pill" id="connection-status">Verificando banco…</span></section>
+    <div class="admin-layout">
+      <section class="admin-panel"><div class="panel-heading"><div><span class="panel-kicker">CADASTRO</span><h2 id="form-title">Novo imóvel</h2></div><button class="quiet-button hidden" id="cancel-edit" type="button">Cancelar edição</button></div>
+        <form id="property-form" class="property-form">
+          <label class="wide">Título do anúncio<input name="titulo" required maxlength="120" placeholder="Ex.: Casa com quintal no Centro"></label>
+          <label>Tipo<select name="tipo" id="property-type" required><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="galpao">Comercial / Galpão</option><option value="terreno">Terreno</option></select></label>
+          <label>Finalidade<select name="finalidade"><option value="venda">Venda</option><option value="locacao">Locação</option></select></label>
+          <label>Preço (R$)<input name="preco" type="number" min="1" step="0.01" required placeholder="250000"></label>
+          <label>Cidade<input name="cidade" required value="Araras" maxlength="80"></label>
+          <label>Bairro<input name="bairro" required maxlength="80" placeholder="Centro"></label>
+          <label>Estado (UF)<input name="uf" required value="SP" maxlength="2"></label>
+          <div class="wide"><div class="detail-heading"><span class="panel-kicker">CAMPOS ESPECÍFICOS</span><span id="detail-hint">Apartamento</span></div><div id="detail-fields" class="detail-fields"></div></div>
+          <label class="wide">Descrição<textarea name="descricao" rows="4" maxlength="1800" placeholder="Descreva o imóvel..."></textarea></label>
+          <div class="form-actions wide"><p class="form-message" id="form-message" aria-live="polite"></p><button class="button button-dark" type="submit"><span id="submit-label">Cadastrar imóvel</span><b>↗</b></button></div>
+        </form>
+      </section>
+      <section class="admin-panel listing-panel"><div class="panel-heading"><div><span class="panel-kicker">CATÁLOGO</span><h2>Imóveis cadastrados</h2></div><button id="refresh-list" class="quiet-button" type="button">Atualizar ↻</button></div><div id="admin-property-list" class="admin-property-list"><div class="admin-empty">Carregando imóveis…</div></div></section>
+    </div>
+    <p class="admin-note">Este painel é uma versão de desenvolvimento. Ainda não possui login nem controle de acesso; use apenas localmente e não publique antes de implementar autenticação.</p>
+  </main>
+  <script src="/admin.js" defer></script>
+</body>
+</html>

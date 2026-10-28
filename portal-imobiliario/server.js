@@ -23,22 +23,32 @@ const propertyTypes = {
   terreno: ['topografia', 'declive']
 };
 
+function parsePropertyId(id) {
+  return ObjectId.isValid(id) ? new ObjectId(id) : null;
+}
+
 function cleanProperty(body) {
   const tipo = String(body.tipo || '').toLowerCase();
   if (!propertyTypes[tipo]) throw new Error('Tipo de imóvel inválido.');
   const preco = Number(body.preco);
   if (!Number.isFinite(preco) || preco <= 0) throw new Error('Informe um preço válido.');
   const allowed = propertyTypes[tipo];
-  const detalhes = Object.fromEntries(Object.entries(body.detalhes || {})
+  const detailsInput = body.detalhes && typeof body.detalhes === 'object' && !Array.isArray(body.detalhes) ? body.detalhes : {};
+  const detalhes = Object.fromEntries(Object.entries(detailsInput)
     .filter(([key, value]) => allowed.includes(key) && value !== '' && value !== null));
-  for (const key of ['andar', 'valor_condominio', 'andares', 'pe_direito_metros', 'docas']) {
-    if (key in detalhes && detalhes[key] !== true && detalhes[key] !== false) {
+  for (const key of ['andar', 'valor_condominio', 'andares', 'pe_direito_metros', 'docas', 'declive']) {
+    if (key in detalhes) {
       const parsed = Number(detalhes[key]);
-      if (!Number.isFinite(parsed)) throw new Error(`O campo ${key} precisa ser numérico.`);
+      if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`O campo ${key} precisa ser um número igual ou maior que zero.`);
       detalhes[key] = parsed;
     }
   }
-  if ('aceita_pet' in detalhes) detalhes.aceita_pet = detalhes.aceita_pet === true || detalhes.aceita_pet === 'true';
+  for (const key of ['aceita_pet', 'quintal', 'churrasqueira']) {
+    if (key in detalhes && typeof detalhes[key] !== 'boolean') throw new Error(`O campo ${key} precisa ser verdadeiro ou falso.`);
+  }
+  if ('area_lazer' in detalhes && !Array.isArray(detalhes.area_lazer)) {
+    detalhes.area_lazer = String(detalhes.area_lazer).split(',').map(value => value.trim()).filter(Boolean).slice(0, 12);
+  }
   return {
     titulo: String(body.titulo || '').trim().slice(0, 120),
     tipo,
@@ -94,6 +104,38 @@ app.post('/api/imoveis', async (req, res) => {
     const result = await db.collection('imoveis').insertOne(property);
     res.status(201).json({ ...property, _id: result.insertedId });
   } catch (error) { res.status(422).json({ error: error.message }); }
+});
+
+app.patch('/api/imoveis/:id', async (req, res) => {
+  if (!mongoAvailable) return res.status(503).json({ error: 'MongoDB não está conectado.' });
+  const _id = parsePropertyId(req.params.id);
+  if (!_id) return res.status(400).json({ error: 'ID inválido.' });
+  try {
+    const current = await db.collection('imoveis').findOne({ _id });
+    if (!current) return res.status(404).json({ error: 'Imóvel não encontrado.' });
+    const property = cleanProperty({ ...current, ...req.body, detalhes: req.body.detalhes ?? current.detalhes,
+      cidade: req.body.cidade ?? current.localizacao?.cidade,
+      bairro: req.body.bairro ?? current.localizacao?.bairro,
+      uf: req.body.uf ?? current.localizacao?.uf });
+    if (!property.titulo || !property.localizacao.cidade || !property.localizacao.bairro) {
+      return res.status(422).json({ error: 'Preencha título, cidade e bairro.' });
+    }
+    property.status = current.status || 'ativo';
+    property.created_at = current.created_at || new Date();
+    await db.collection('imoveis').updateOne({ _id }, { $set: property });
+    res.json({ ...property, _id });
+  } catch (error) { res.status(422).json({ error: error.message }); }
+});
+
+app.delete('/api/imoveis/:id', async (req, res) => {
+  if (!mongoAvailable) return res.status(503).json({ error: 'MongoDB não está conectado.' });
+  const _id = parsePropertyId(req.params.id);
+  if (!_id) return res.status(400).json({ error: 'ID inválido.' });
+  try {
+    const result = await db.collection('imoveis').updateOne({ _id }, { $set: { status: 'arquivado', updated_at: new Date() } });
+    if (!result.matchedCount) return res.status(404).json({ error: 'Imóvel não encontrado.' });
+    res.json({ message: 'Imóvel arquivado.' });
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.get('/api/leads', async (_req, res) => {

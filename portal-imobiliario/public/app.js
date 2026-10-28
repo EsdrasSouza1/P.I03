@@ -12,6 +12,7 @@ let properties = [];
 const money = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value || 0);
 const titleType = type => ({ casa: 'Casa', apartamento: 'Apartamento', terreno: 'Terreno', galpao: 'Comercial' }[type] || 'Imóvel');
 const imageUrl = (id, width = 760) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
 function card(item, index) {
   const fallback = fallbackProperties[index % fallbackProperties.length];
@@ -19,9 +20,9 @@ function card(item, index) {
   const location = item.localizacao || fallback.localizacao;
   const detail = item.detalhes || {};
   const features = [detail.area ? `${detail.area} m²` : fallback.area, detail.quartos ? `${detail.quartos} quartos` : fallback.rooms, detail.vagas ? `${detail.vagas} vagas` : fallback.garage].filter(Boolean);
-  return `<article class="property-card" data-id="${item._id || ''}">
-    <div class="property-image"><img src="${item.image ? imageUrl(item.image) : imageUrl(fallback.image)}" alt="${item.titulo || fallback.titulo}" loading="lazy"><span class="badge">${titleType(type)} · ${item.finalidade === 'locacao' ? 'Locação' : 'À venda'}</span><button class="favorite" aria-label="Favoritar imóvel">♡</button></div>
-    <div class="property-content"><div class="property-topline"><span>ESPAÇO SELECIONADO</span><span>● DISPONÍVEL</span></div><h3>${item.titulo || fallback.titulo}</h3><div class="property-location">⌖ &nbsp;${location.bairro || fallback.localizacao.bairro}, ${location.cidade || fallback.localizacao.cidade}</div><div class="property-features">${features.map(f => `<span>⌂ ${f}</span>`).join('')}</div><div class="property-footer"><div class="property-price">${money(item.preco || fallback.preco)}<small>${item.finalidade === 'locacao' ? 'por mês' : 'valor do imóvel'}</small></div><span class="card-arrow">↗</span></div></div>
+  return `<article class="property-card" data-id="${escapeHtml(item._id || '')}">
+    <div class="property-image"><img src="${item.image ? imageUrl(encodeURIComponent(item.image)) : imageUrl(fallback.image)}" alt="${escapeHtml(item.titulo || fallback.titulo)}" loading="lazy"><span class="badge">${escapeHtml(titleType(type))} · ${item.finalidade === 'locacao' ? 'Locação' : 'À venda'}</span><button class="favorite" aria-label="Favoritar imóvel">♡</button></div>
+    <div class="property-content"><div class="property-topline"><span>ESPAÇO SELECIONADO</span><span>● DISPONÍVEL</span></div><h3>${escapeHtml(item.titulo || fallback.titulo)}</h3><div class="property-location">⌖ &nbsp;${escapeHtml(location.bairro || fallback.localizacao.bairro)}, ${escapeHtml(location.cidade || fallback.localizacao.cidade)}</div><div class="property-features">${features.map(f => `<span>⌂ ${escapeHtml(f)}</span>`).join('')}</div><div class="property-footer"><div class="property-price">${money(item.preco || fallback.preco)}<small>${item.finalidade === 'locacao' ? 'por mês' : 'valor do imóvel'}</small></div><span class="card-arrow">↗</span></div></div>
   </article>`;
 }
 
