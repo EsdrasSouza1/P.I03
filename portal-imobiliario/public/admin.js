@@ -26,8 +26,18 @@ const detailFields = document.querySelector('#detail-fields');
 const list = document.querySelector('#admin-property-list');
 const message = document.querySelector('#form-message');
 let editingId = null;
-let databaseConnected = false;
-let properties = [];
+const propertiesKey = 'bartarin-properties';
+function readProperties() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(propertiesKey) || 'null');
+    if (Array.isArray(saved)) return saved;
+  } catch { localStorage.removeItem(propertiesKey); }
+  const initial = structuredClone(window.BartarinDemoProperties || []);
+  localStorage.setItem(propertiesKey, JSON.stringify(initial));
+  return initial;
+}
+let properties = readProperties();
+function saveProperties() { localStorage.setItem(propertiesKey, JSON.stringify(properties)); }
 const formatMoney = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value || 0);
 const typeLabel = type => ({ apartamento: 'Apartamento', casa: 'Casa', galpao: 'Comercial / Galpão', terreno: 'Terreno' }[type] || type);
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
@@ -97,22 +107,10 @@ function propertyCard(item) {
   return `<article class="admin-property"><div class="admin-property-info"><span class="admin-property-type">${escapeHtml(typeLabel(item.tipo))} · ${item.finalidade === 'locacao' ? 'Locação' : 'Venda'}</span><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(location)} · ${formatMoney(item.preco)}</p></div><div class="admin-property-actions"><button class="quiet-button edit-property" data-id="${escapeHtml(item._id)}" type="button">Editar</button><button class="quiet-button archive-property" data-id="${escapeHtml(item._id)}" type="button">Arquivar</button></div></article>`;
 }
 
-async function refreshProperties() {
-  try {
-    const [statusResponse, propertiesResponse] = await Promise.all([fetch('/api/status'), fetch('/api/imoveis?todos=true')]);
-    const status = await statusResponse.json();
-    databaseConnected = status.mongo;
-    const pill = document.querySelector('#connection-status');
-    pill.textContent = databaseConnected ? 'MongoDB conectado' : 'MongoDB desconectado';
-    pill.classList.toggle('connected', databaseConnected);
-    if (!propertiesResponse.ok) throw new Error('Não foi possível carregar os imóveis.');
-    properties = await propertiesResponse.json();
-    list.innerHTML = properties.length ? properties.map(propertyCard).join('') : '<div class="admin-empty">Nenhum imóvel cadastrado no banco ainda.</div>';
-    if (!databaseConnected) showMessage('Modo demonstração: conecte o MongoDB para salvar anúncios.', true);
-    else clearMessage();
-  } catch (error) {
-    list.innerHTML = `<div class="admin-empty">${error.message}</div>`;
-  }
+function refreshProperties() {
+  properties = readProperties();
+  const active = properties.filter(item => item.status !== 'arquivado');
+  list.innerHTML = active.length ? active.map(propertyCard).join('') : '<div class="admin-empty">Nenhum imóvel ativo nesta demonstração.</div>';
 }
 
 typeSelect.addEventListener('change', () => renderDetailFields());
@@ -121,19 +119,19 @@ document.querySelector('#refresh-list').addEventListener('click', refreshPropert
 form.addEventListener('submit', async event => {
   event.preventDefault();
   clearMessage();
-  if (!databaseConnected) return showMessage('MongoDB desconectado. O cadastro não pode ser salvo ainda.', true);
-  const url = editingId ? `/api/imoveis/${editingId}` : '/api/imoveis';
   try {
-    const response = await fetch(url, {
-      method: editingId ? 'PATCH' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(readPayload())
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Não foi possível salvar o imóvel.');
+    const payload = readPayload();
+    if (editingId) {
+      const index = properties.findIndex(property => String(property._id) === String(editingId));
+      if (index < 0) throw new Error('Imóvel não encontrado nesta demonstração.');
+      properties[index] = { ...properties[index], ...payload, preco: Number(payload.preco), localizacao: { cidade: payload.cidade, bairro: payload.bairro, uf: payload.uf }, status: 'ativo' };
+    } else {
+      properties.unshift({ ...payload, _id: `demo-${Date.now()}`, preco: Number(payload.preco), localizacao: { cidade: payload.cidade, bairro: payload.bairro, uf: payload.uf }, status: 'ativo', image: 'photo-1600585154340-be6161a56a0c' });
+    }
+    saveProperties();
     const successMessage = editingId ? 'Alterações salvas.' : 'Imóvel cadastrado.';
     resetForm();
-    await refreshProperties();
+    refreshProperties();
     showMessage(successMessage);
   } catch (error) { showMessage(error.message, true); }
 });
@@ -146,13 +144,11 @@ list.addEventListener('click', async event => {
   }
   const archiveButton = event.target.closest('.archive-property');
   if (!archiveButton) return;
-  if (!confirm('Arquivar este imóvel? Ele deixará de aparecer no catálogo.')) return;
-  try {
-    const response = await fetch(`/api/imoveis/${archiveButton.dataset.id}`, { method: 'DELETE' });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Não foi possível arquivar.');
-    await refreshProperties();
-  } catch (error) { showMessage(error.message, true); }
+  if (!confirm('Arquivar este imóvel nesta demonstração?')) return;
+  const property = properties.find(item => String(item._id) === String(archiveButton.dataset.id));
+  if (property) property.status = 'arquivado';
+  saveProperties();
+  refreshProperties();
 });
 
 renderDetailFields();

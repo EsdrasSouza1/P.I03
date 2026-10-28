@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5f7f3">
+  <title>CRM de leads — Bartarin Imóveis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css">
+</head>
+<body class="crm-page">
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a class="active" href="/crm.html">CRM</a><a href="/admin.html">Imóveis</a><a href="/">Portal público</a></nav><a class="button button-outline staff-button" href="/login.html">Área da equipe</a></header>
+  <main class="crm-main">
+    <aside class="crm-sidebar"><span class="sidebar-label">ESPAÇO DE TRABALHO</span><a class="sidebar-link active" href="/crm.html"><span>▦</span> Visão geral</a><a class="sidebar-link" href="#leads"><span>♧</span> Leads <b id="sidebar-lead-count">0</b></a><a class="sidebar-link" href="/admin.html"><span>⌂</span> Imóveis</a><div class="sidebar-bottom"><span class="avatar-initials">BI</span><span><strong>Bartarin Imóveis</strong><small>Protótipo acadêmico</small></span></div></aside>
+    <section class="crm-content"><div class="crm-title-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> RELACIONAMENTO COM CLIENTES</div><h1>Visão <em>geral.</em></h1><p>Acompanhe os contatos e mantenha cada oportunidade em movimento.</p></div><span class="demo-badge"><i></i> MODO DEMONSTRAÇÃO</span></div>
+      <div class="crm-notice">Os nomes e contatos abaixo são fictícios. Este CRM é uma demonstração de frontend; alterações ficam somente neste navegador.</div>
+      <div class="crm-metrics"><article class="metric-card"><span>LEADS NO TOTAL</span><strong id="metric-total">—</strong><small>contatos cadastrados</small><i>♧</i></article><article class="metric-card"><span>NOVOS CONTATOS</span><strong id="metric-new">—</strong><small>aguardando primeiro retorno</small><i>✳</i></article><article class="metric-card"><span>VISITAS AGENDADAS</span><strong id="metric-visits">—</strong><small>próximas visitas</small><i>⌖</i></article><article class="metric-card"><span>EM ATENDIMENTO</span><strong id="metric-working">—</strong><small>em conversa com a equipe</small><i>↗</i></article></div>
+      <div class="crm-workspace"><section class="crm-panel" id="leads"><div class="crm-panel-head"><div><span class="panel-kicker">ACOMPANHAMENTO</span><h2>Leads recentes</h2></div><label class="crm-search">⌕ <input id="lead-search" type="search" placeholder="Buscar lead"></label></div><div class="crm-filters"><button class="lead-filter active" data-stage="todos">Todos</button><button class="lead-filter" data-stage="novo">Novos</button><button class="lead-filter" data-stage="em_atendimento">Em atendimento</button><button class="lead-filter" data-stage="visita_agendada">Visitas</button></div><div id="lead-list" class="lead-list"></div></section>
+        <section class="crm-panel lead-detail-panel"><div class="crm-panel-head"><div><span class="panel-kicker">FICHA DO CONTATO</span><h2 id="lead-detail-heading">Selecione um lead</h2></div></div><div id="lead-detail" class="lead-detail-empty">Escolha uma pessoa na lista para ver etapa e histórico de atendimento.</div></section></div>
+    </section>
+  </main>
+  <script src="/data.js" defer></script><script src="/crm.js" defer></script>
+</body>
+</html>

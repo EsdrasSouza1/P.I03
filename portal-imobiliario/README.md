@@ -1,188 +1,86 @@
-# Bartarin Imóveis — Portal Imobiliário e CRM
+# Bartarin Imóveis — Protótipo de frontend
 
-Projeto Integrador acadêmico para desenvolver um portal imobiliário com cadastro flexível de imóveis e um CRM básico de leads, tendo como contexto a Bartarin Imóveis, em Araras, SP.
+> Protótipo acadêmico de interface para um portal imobiliário e CRM de leads no contexto da Bartarin Imóveis, em Araras, SP. **O escopo atual é somente frontend**: não há API de negócio, autenticação real ou banco de dados.
 
-> **Estado atual:** protótipo em desenvolvimento. O catálogo público e o painel local de gestão estão implementados. A persistência depende de uma conexão MongoDB configurada. Autenticação e permissões ainda não foram implementadas; use o painel somente localmente.
+## O que dá para demonstrar
 
-## Sumário
-
-- [Objetivo](#objetivo)
-- [Problema e justificativa do MongoDB](#problema-e-justificativa-do-mongodb)
-- [Tecnologias](#tecnologias)
-- [Funcionalidades](#funcionalidades)
-- [Requisitos e instalação](#requisitos-e-instalação)
-- [Configuração do MongoDB](#configuração-do-mongodb)
-- [Estrutura](#estrutura)
-- [Modelagem](#modelagem)
-- [API](#api)
-- [Dados de demonstração](#dados-de-demonstração)
-- [Limitações e segurança](#limitações-e-segurança)
-- [Próximas etapas](#próximas-etapas)
-
-## Objetivo
-
-Construir uma aplicação web para apresentar e buscar imóveis, cadastrar propriedades com informações adequadas a cada categoria e organizar pessoas interessadas e o histórico de atendimento. CRM significa *Customer Relationship Management*: uma ferramenta para acompanhar o relacionamento com clientes.
-
-## Problema e justificativa do MongoDB
-
-As categorias de imóveis têm atributos diferentes. Uma casa pode ter quintal e churrasqueira; um apartamento pode informar andar, condomínio e aceitação de pets; um galpão pode ter pé-direito, docas e zoneamento; um terreno pode registrar topografia e declive.
-
-O projeto mantém os campos comuns no documento principal e guarda os atributos da categoria em `detalhes`. Assim, documentos diferentes podem ficar na mesma coleção `imoveis` sem precisar apresentar os mesmos campos. Essa flexibilidade é a justificativa acadêmica para MongoDB neste domínio. Não significa que bancos relacionais não consigam representar os dados nem que MongoDB seja sempre a melhor escolha. A aplicação ainda precisa validar cada documento.
+- portal imobiliário responsivo, com imóveis fictícios;
+- busca por tipo, bairro/cidade, finalidade, faixa de preço e algumas características;
+- detalhes de imóvel e favoritos salvos no `localStorage` do navegador;
+- tela de gestão de imóveis com cadastro, edição e arquivamento simulados no `localStorage`;
+- telas visuais de login, cadastro de cliente e recuperação de senha;
+- painel CRM com leads fictícios, filtros, etapas e histórico demonstrativos;
+- identidade visual em verde sálvia, off-white e tons neutros.
 
 ## Tecnologias
 
-- Frontend: HTML, CSS e JavaScript.
-- Backend: Node.js e Express.
-- Banco: MongoDB, usando o driver oficial `mongodb` para Node.js.
-- Configuração local: `dotenv`.
+- **Frontend:** HTML, CSS e JavaScript.
+- **Armazenamento demonstrativo:** `localStorage` do navegador, sem servidor de dados.
+- **Pré-visualização local opcional:** Node.js com módulos nativos somente para servir arquivos estáticos. Não implementa backend nem API.
 
-A proposta inicial mencionava Laravel ou Spring Boot. Este protótipo foi iniciado em Node/Express porque PHP e Composer não estavam disponíveis no ambiente. É preciso confirmar com o professor se essa stack é aceita.
+Não há dependências npm de aplicação e não é necessário MongoDB.
 
-## Funcionalidades
+## Abrir o projeto
 
-### Portal público
+### Opção 1: servidor estático incluído
 
-- página inicial responsiva em verde sálvia, off-white e tons neutros;
-- catálogo e filtros por tipo, cidade/bairro e faixa de preço;
-- formulário público para cadastrar um lead quando o MongoDB estiver conectado;
-- conteúdo fictício local para visualizar o catálogo sem banco.
-
-### Painel de imóveis
-
-Abra `/admin.html` para cadastrar, editar e arquivar imóveis. Os campos específicos mudam conforme a categoria:
-
-- apartamento: andar, valor do condomínio, aceita pets, área de lazer;
-- casa: quintal, andares, churrasqueira;
-- galpão: pé-direito, docas, zoneamento;
-- terreno: topografia e declive.
-
-Arquivar é uma remoção lógica: o documento continua no banco com status `arquivado` e sai do catálogo público.
-
-## Requisitos e instalação
-
-Requer Node.js 20 ou posterior, npm e MongoDB local ou Atlas para persistência. Na pasta deste projeto:
+Requer Node.js 20 ou posterior. No terminal, dentro da pasta `portal-imobiliario`:
 
 ```bash
-npm install
-cp .env.example .env
-npm run dev
+npm start
 ```
 
-Se o modo watch falhar por limite de arquivos observados, use `npm start`. Acesse:
+Depois, abra <http://localhost:3000>.
 
-- Portal: <http://localhost:3000>
-- Painel de imóveis: <http://localhost:3000/admin.html>
-- Estado do banco: <http://localhost:3000/api/status>
+### Opção 2: VS Code Live Server
 
-## Configuração do MongoDB
+Abra `public/index.html` com a extensão Live Server. Para testar as outras telas, navegue pelas URLs abaixo:
 
-`.env.example`:
+- Portal: `/`
+- Gestão demonstrativa: `/admin.html`
+- Login: `/login.html`
+- Cadastro: `/cadastro.html`
+- Recuperação de senha: `/recuperar-senha.html`
+- CRM: `/crm.html`
 
-```env
-PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017
-MONGODB_DATABASE=portal_imobiliario
-```
+## Como os dados de demonstração funcionam
 
-Inicie o serviço MongoDB local antes do servidor ou coloque a URI do Atlas em `.env`. Nunca commite uma URI que contenha credenciais. Na inicialização, o servidor tenta conectar e cria índices iniciais. Se não conseguir, inicia em modo de demonstração; os dados fictícios aparecem no portal, mas gravações ficam indisponíveis.
+Os imóveis e leads de exemplo são definidos em `public/data.js`. A tela de gestão e o CRM permitem interações demonstrativas; alterações ficam no armazenamento local daquele navegador e não são enviadas para nenhum servidor. O portal lê os imóveis demonstrativos e os que foram criados localmente na tela de gestão. Favoritos também ficam no navegador.
+
+Login, criação de conta e recuperação de senha são somente telas. Não digite senhas reais: esses formulários não autenticam ninguém e não devem armazenar credenciais. O formulário público de contato também não envia nem guarda os dados informados.
+
+Os nomes, contatos, endereços, valores e disponibilidade dos imóveis de exemplo são fictícios. Não representam anúncios confirmados da imobiliária.
 
 ## Estrutura
 
 ```text
 portal-imobiliario/
 ├── public/
-│   ├── admin.html       # gestão local de imóveis
-│   ├── admin.js         # formulário dinâmico e operações do painel
-│   ├── app.js           # catálogo, filtros e formulário público
-│   ├── index.html       # portal público
-│   └── styles.css       # estilos
-├── .env.example
-├── .gitignore
-├── package.json
-├── package-lock.json
-├── server.js            # Express e API MongoDB
-├── README.md
-└── PLANO_DO_PROJETO.md  # checklist de requisitos e progresso
+│   ├── admin.html / admin.js       # gestão local demonstrativa de imóveis
+│   ├── auth.js                     # interações das telas de acesso
+│   ├── cadastro.html               # cadastro visual
+│   ├── crm.html / crm.js            # painel CRM de demonstração
+│   ├── data.js                     # imóveis e leads fictícios
+│   ├── index.html / app.js          # portal, filtros, detalhes e favoritos
+│   ├── login.html                  # tela de login visual
+│   ├── recuperar-senha.html         # tela de recuperação visual
+│   └── styles.css                  # estilos compartilhados
+├── package.json                    # comando opcional para pré-visualizar
+├── server.js                       # servidor estático local, sem API
+└── PLANO_DO_PROJETO.md             # escopo e checklist do protótipo
 ```
 
-## Modelagem
+## Limites do protótipo
 
-### Coleção `imoveis`
+- os dados no `localStorage` existem apenas naquele navegador e podem ser apagados;
+- não há usuários, autenticação, autorização ou envio de e-mail;
+- não há persistência compartilhada nem sincronização entre dispositivos;
+- o CRM usa contatos fictícios e não recebe os formulários do portal;
+- imagens remotas são apenas ilustrativas;
+- este protótipo não cumpre requisitos que exijam backend ou MongoDB.
 
-```json
-{
-  "titulo": "Apartamento com varanda",
-  "tipo": "apartamento",
-  "finalidade": "venda",
-  "preco": 680000,
-  "localizacao": { "cidade": "Araras", "bairro": "Centro", "uf": "SP" },
-  "detalhes": {
-    "andar": 7,
-    "valor_condominio": 780,
-    "aceita_pet": true,
-    "area_lazer": ["piscina", "academia"]
-  },
-  "status": "ativo"
-}
-```
+Como a proposta acadêmica original mencionava MongoDB obrigatório, confirme com o professor que a entrega pode ser avaliada somente como frontend. O protótipo atual serve para demonstrar fluxos e telas.
 
-MongoDB cria um `_id` para identificar cada documento. Para casa, galpão e terreno, `detalhes` contém outras propriedades específicas.
+## Próximos passos de frontend
 
-### Coleção `leads`
-
-```json
-{
-  "nome": "Marina Oliveira",
-  "email": "marina@example.com",
-  "etapa": "novo",
-  "imoveis_favoritos": [],
-  "historico": [
-    { "data": "2026-10-28T12:00:00.000Z", "tipo": "cadastro", "observacao": "Lead cadastrado pelo portal." }
-  ]
-}
-```
-
-O histórico é embutido no lead porque neste protótipo costuma ser consultado junto com o cadastro. A coleção `users`, para administradores, corretores e clientes, está planejada, mas ainda não implementada.
-
-## API
-
-As rotas de gravação e leitura do CRM requerem conexão MongoDB.
-
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/api/status` | Informa se o MongoDB está conectado. |
-| `GET` | `/api/imoveis` | Lista imóveis ativos; aceita `tipo`, `cidade`, `preco_min`, `preco_max`. |
-| `POST` | `/api/imoveis` | Cadastra imóvel e valida campos comuns e específicos. |
-| `PATCH` | `/api/imoveis/:id` | Atualiza imóvel. |
-| `DELETE` | `/api/imoveis/:id` | Arquiva imóvel. |
-| `GET` | `/api/leads` | Lista leads; ainda sem proteção de acesso. |
-| `POST` | `/api/leads` | Cadastra lead com histórico inicial. |
-| `PATCH` | `/api/leads/:id` | Atualiza etapa e/ou acrescenta observação. |
-
-Exemplo: `GET /api/imoveis?tipo=apartamento&cidade=Araras&preco_min=150000&preco_max=700000`.
-
-## Dados de demonstração
-
-Os imóveis locais são fictícios. Bairros de Araras são usados como referência de interface, mas preço, disponibilidade e características não são anúncios confirmados da Bartarin Imóveis. Confirme autorização antes de usar logo, telefones, CRECI ou anúncios reais.
-
-## Limitações e segurança
-
-- O painel de gestão não tem login nem permissões. Não publique o servidor na internet.
-- Rotas de leads expõem dados pessoais e também não têm autenticação.
-- O MongoDB ainda precisa ser configurado em cada ambiente.
-- Não há upload de imagens; as fotos atuais são remotas e demonstrativas.
-- Favoritos alteram apenas a interface e não são persistidos.
-- Faltam página de detalhes, paginação e filtros para todos os campos específicos.
-- Não há testes automatizados.
-- A stack Node/Express precisa ser aprovada pelo professor, pois a proposta citava Laravel ou Spring Boot.
-
-## Próximas etapas
-
-Consulte o [PLANO_DO_PROJETO.md](./PLANO_DO_PROJETO.md) para o checklist completo. Prioridades:
-
-1. confirmar stack e conectar MongoDB de desenvolvimento;
-2. modelar usuários e referências entre usuários, leads e imóveis;
-3. implementar login, papéis e proteção de rotas/dados pessoais;
-4. construir o painel CRM;
-5. completar catálogo, filtros, favoritos e imagens;
-6. revisar segurança, testar fluxos e preparar a apresentação.
+O checklist está em [PLANO_DO_PROJETO.md](./PLANO_DO_PROJETO.md). As melhorias visuais podem incluir revisão responsiva, acessibilidade, mais estados de interface e páginas de perfil/cliente. Backend, autenticação e banco ficam fora do escopo atual.

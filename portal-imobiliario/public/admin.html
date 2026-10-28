@@ -11,9 +11,9 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a href="/">Ver portal ↗</a></nav><span class="admin-label">ÁREA DE GESTÃO · DESENVOLVIMENTO</span></header>
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a href="/crm.html">CRM</a><a href="/">Ver portal ↗</a></nav><span class="admin-label">ÁREA DE GESTÃO · DESENVOLVIMENTO</span></header>
   <main class="admin-page">
-    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE IMÓVEIS</div><h1>Gerencie seus <em>espaços.</em></h1><p>Cadastre imóveis e informe os detalhes próprios de cada categoria.</p></div><span class="connection-pill" id="connection-status">Verificando banco…</span></section>
+    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE IMÓVEIS</div><h1>Gerencie seus <em>espaços.</em></h1><p>Cadastre imóveis e informe os detalhes próprios de cada categoria.</p></div><span class="connection-pill local-demo" id="connection-status">Demonstração local</span></section>
     <div class="admin-layout">
       <section class="admin-panel"><div class="panel-heading"><div><span class="panel-kicker">CADASTRO</span><h2 id="form-title">Novo imóvel</h2></div><button class="quiet-button hidden" id="cancel-edit" type="button">Cancelar edição</button></div>
         <form id="property-form" class="property-form">
@@ -31,8 +31,8 @@
       </section>
       <section class="admin-panel listing-panel"><div class="panel-heading"><div><span class="panel-kicker">CATÁLOGO</span><h2>Imóveis cadastrados</h2></div><button id="refresh-list" class="quiet-button" type="button">Atualizar ↻</button></div><div id="admin-property-list" class="admin-property-list"><div class="admin-empty">Carregando imóveis…</div></div></section>
     </div>
-    <p class="admin-note">Este painel é uma versão de desenvolvimento. Ainda não possui login nem controle de acesso; use apenas localmente e não publique antes de implementar autenticação.</p>
+    <p class="admin-note">Demonstração de frontend: os imóveis de exemplo e as alterações ficam salvos somente neste navegador. Não existe login ou banco de dados conectado.</p>
   </main>
-  <script src="/admin.js" defer></script>
+  <script src="/data.js" defer></script><script src="/admin.js" defer></script>
 </body>
 </html>
