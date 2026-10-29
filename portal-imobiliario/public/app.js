@@ -65,7 +65,7 @@ function propertyCard(item) {
   const image = item.image || 'photo-1600585154340-be6161a56a0c';
   return `<article class="property-card" data-id="${escapeHtml(item._id)}" tabindex="0" role="button" aria-label="Ver detalhes de ${escapeHtml(item.titulo)}">
     <div class="property-image"><img src="${imageUrl(image)}" alt="${escapeHtml(item.titulo)}" loading="lazy"><span class="badge">${escapeHtml(typeLabel(item.tipo))} · ${item.finalidade === 'locacao' ? 'Locação' : 'À venda'}</span><button class="favorite ${favorites.has(String(item._id)) ? 'favorited' : ''}" data-favorite="${escapeHtml(item._id)}" aria-label="${favorites.has(String(item._id)) ? 'Remover dos' : 'Adicionar aos'} favoritos" aria-pressed="${favorites.has(String(item._id))}">${favorites.has(String(item._id)) ? '♥' : '♡'}</button></div>
-    <div class="property-content"><div class="property-topline"><span>ESPAÇO SELECIONADO</span><span>● DISPONÍVEL</span></div><h3>${escapeHtml(item.titulo)}</h3><div class="property-location">⌖ &nbsp;${escapeHtml(item.localizacao?.bairro)}, ${escapeHtml(item.localizacao?.cidade)}</div><div class="property-features">${features.map(value => `<span>⌂ ${escapeHtml(value)}</span>`).join('')}</div><div class="property-footer"><div class="property-price">${money(item.preco)}<small>${item.finalidade === 'locacao' ? 'por mês' : 'valor demonstrativo'}</small></div><span class="card-arrow">↗</span></div></div>
+    <div class="property-content"><div class="property-topline"><span>ANÚNCIO DE EXEMPLO</span><span>DEMONSTRAÇÃO</span></div><h3>${escapeHtml(item.titulo)}</h3><div class="property-location">⌖ &nbsp;${escapeHtml(item.localizacao?.bairro)}, ${escapeHtml(item.localizacao?.cidade)}</div><div class="property-features">${features.map(value => `<span>⌂ ${escapeHtml(value)}</span>`).join('')}</div><div class="property-footer"><div class="property-price">${money(item.preco)}<small>${item.finalidade === 'locacao' ? 'valor mensal ilustrativo' : 'valor ilustrativo'}</small></div><span class="card-arrow">↗</span></div></div>
   </article>`;
 }
 
@@ -168,8 +168,9 @@ document.querySelector('#lead-form').addEventListener('submit', event => {
   event.preventDefault();
   const form = event.currentTarget;
   const message = document.querySelector('#lead-message');
-  message.textContent = 'Demonstração de frontend: seus dados não foram enviados nem armazenados.';
-  message.classList.add('error');
+  message.textContent = 'Fluxo demonstrado. Seus dados não foram enviados nem armazenados.';
+  message.classList.remove('error');
+  message.classList.add('success');
 });
 
 renderSpecificFilters();
