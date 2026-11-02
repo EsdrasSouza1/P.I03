@@ -2,7 +2,7 @@
 
 ## Objetivo do protótipo
 
-Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o contexto acadêmico da Bartarin Imóveis, em Araras. Não há backend, autenticação nem banco de dados no escopo atual. As informações são fictícias e as alterações ficam localmente no navegador.
+Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o contexto acadêmico da Bartarin Imóveis, em Araras. Não há backend, autenticação nem banco de dados no escopo atual. O catálogo usa um retrato dos anúncios públicos de venda; dados do CRM são fictícios e alterações ficam localmente no navegador.
 
 > A proposta inicial da disciplina mencionava MongoDB obrigatório. Confirmar com o professor que a entrega pode ser somente frontend.
 
@@ -10,15 +10,17 @@ Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o co
 
 - [x] HTML, CSS e JavaScript no navegador.
 - [x] `localStorage` para simular favoritos, alterações de imóveis e alterações de leads.
-- [x] Node.js nativo opcional apenas para servir arquivos durante a pré-visualização.
+- [x] Node.js nativo opcional para pré-visualização e encaminhamento limitado das fotos públicas ao exportador de artes.
 - [x] Sem dependências npm de aplicação, API ou conexão MongoDB.
 
 ## 1. Portal e busca de imóveis
 
 - [x] Página inicial responsiva e identidade visual leve.
-- [x] Catálogo com imóveis fictícios em quatro categorias.
-- [x] Filtros por tipo, cidade/bairro, finalidade, preço e atributos selecionados.
+- [x] Catálogo com os 77 anúncios públicos de venda consultados em 01/11/2026, em seis categorias.
+- [x] Filtros por tipo, bairro de Araras, dormitórios e faixa de preço.
 - [x] Detalhes do imóvel.
+- [x] Galeria navegável com as fotos disponíveis em cada anúncio.
+- [x] Mapa aproximado pelo bairro, sem publicar endereço exato.
 - [x] Favoritos locais no navegador.
 - [x] Formulário de interesse demonstrativo sem envio de dados.
 - [ ] Revisar experiência em tamanhos variados de tela.
@@ -28,8 +30,9 @@ Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o co
 
 - [x] Formulário que adapta campos pela categoria.
 - [x] Criar, editar e arquivar imóveis no `localStorage`.
-- [x] Compartilhar os exemplos e alterações locais entre o painel e o catálogo no mesmo navegador.
-- [ ] Incluir imagens locais demonstrativas e uma galeria visual.
+- [x] Adicionar até 8 fotos por imóvel; redimensionar e converter para WebP no navegador antes de salvar.
+- [x] Criar carrossel para Instagram em proporção 4:5, com prévia e download individual dos slides em PNG.
+- [x] Compartilhar os anúncios e alterações locais entre o painel e o catálogo no mesmo navegador.
 - [ ] Adicionar ordenação e paginação visuais.
 
 ## 3. Conta e acesso (somente telas)
@@ -51,7 +54,7 @@ Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o co
 ## 5. Apresentação e entrega
 
 - [x] Documentar escopo frontend no README.
-- [x] Identificar dados de imóveis e contatos como fictícios.
+- [x] Identificar os anúncios com referência e link de origem; identificar os contatos do CRM como fictícios.
 - [ ] Confirmar com o professor que o escopo sem MongoDB atende à avaliação.
 - [ ] Preparar roteiro curto para demonstrar busca, favoritos, gestão e CRM.
 - [ ] Fazer revisão final em desktop e celular.
@@ -66,4 +69,4 @@ Demonstrar apenas a interface de um portal imobiliário e CRM de leads para o co
 
 ## Como executar a pré-visualização
 
-Dentro da pasta `portal-imobiliario`, rode `npm start` e acesse `http://localhost:3000`. Esse processo serve arquivos estáticos e não é um backend do produto. Também é possível abrir com a extensão Live Server do VS Code.
+Dentro da pasta `portal-imobiliario`, rode `npm start` e acesse `http://localhost:3000`. Esse processo serve os arquivos e encaminha imagens do domínio público da imobiliária para a exportação das artes; não implementa API de negócio nem banco de dados. Também é possível abrir com a extensão Live Server do VS Code; nesse caso, as fotos que você adicionou ao imóvel funcionam, mas as fotos externas dos anúncios precisam do servidor local.
