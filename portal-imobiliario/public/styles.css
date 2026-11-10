@@ -32,6 +32,8 @@ a { color: inherit; text-decoration: none; }
 .button:hover { transform: translateY(-2px); }
 .button span, .button b { font-size: 16px; font-weight: 400; }
 .button-outline { border: 1px solid #dce2db; background: transparent; color: var(--ink); }
+.header-login { gap: 8px; border-radius: 3px; background: var(--green); color: white; }
+.header-login:hover { background: #365849; }
 
 .hero { position: relative; padding: 50px 7.1% 42px; min-height: 464px; display: grid; grid-template-columns: 45% 55%; align-items: center; overflow: hidden; }
 .hero-copy { padding: 16px 30px 15px 0; z-index: 1; }
@@ -303,6 +305,7 @@ a { color: inherit; text-decoration: none; }
 .auth-header { height: 78px; padding: 0 7%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8ebe5; background: #fbfcf9; }
 .back-link { color: #6d7c70; font-size: 10px; }
 .auth-layout { min-height: calc(100vh - 78px); max-width: 1260px; margin: 0 auto; padding: 45px 5%; display: grid; grid-template-columns: 1fr .82fr; align-items: center; gap: 7%; }
+.login-page .auth-layout { min-height: auto; max-width: 1100px; margin: 45px auto; padding: 19px; gap: 19px; border-radius: 3px; box-shadow: 0 14px 36px rgba(48, 58, 50, .16); }
 .auth-visual { position: relative; min-height: 570px; overflow: hidden; background: #dbe4d9; }
 .auth-visual:after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #17271fbd, transparent 68%); }
 .auth-visual img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
@@ -317,6 +320,9 @@ a { color: inherit; text-decoration: none; }
 .auth-form { display: grid; gap: 15px; }
 .auth-form > label { color: #718073; font-size: 9px; }
 .auth-form input:not([type=checkbox]) { display: block; width: 100%; padding: 13px 12px; margin-top: 6px; border: 1px solid #e2e8e0; background: white; color: var(--ink); font-size: 11px; outline-color: #8fa68f; }
+.auth-input-wrap { position: relative; display: block; }
+.auth-input-wrap input:not([type=checkbox]) { padding-left: 40px; }
+.auth-field-icon { position: absolute; z-index: 1; left: 13px; top: calc(50% + 3px); width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: #718073; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .password-wrap { position: relative; display: block; }
 .password-wrap input { padding-right: 45px !important; }
 .show-password { position: absolute; right: 7px; bottom: 5px; width: 34px; height: 34px; border: 0; background: transparent; color: #7b8b7d; cursor: pointer; }
@@ -324,9 +330,13 @@ a { color: inherit; text-decoration: none; }
 .auth-inline a, .auth-foot a { color: #52735a; font-size: 10px; font-weight: 600; }
 .auth-submit { width: 100%; justify-content: space-between; padding: 0 16px; margin-top: 2px; }
 .demo-access { margin-top: 11px; }
+.auth-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.auth-actions .auth-submit { width: auto; min-width: 120px; justify-content: center; gap: 8px; border-radius: 3px; }
+.auth-button-icon { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .auth-separator { margin: 21px 0 16px; display: flex; align-items: center; gap: 13px; color: #a2aaa3; font-size: 8px; }
 .auth-separator span { height: 1px; background: #e4e9e2; flex: 1; }
 .auth-card .auth-foot { color: #818b82; text-align: center; margin: 0 0 19px; }
+.admin-portal-link { margin-top: 22px !important; }
 .auth-foot.standalone { display: inline-block; margin-top: 18px; }
 .terms-check { display: flex; align-items: flex-start; gap: 8px; line-height: 1.6; }
 .terms-check input { margin: 2px 0 0; accent-color: var(--green); }
@@ -409,6 +419,7 @@ a { color: inherit; text-decoration: none; }
 .note-form .button { min-height: 36px; justify-content: space-between; margin: 0; font-size: 8px; }
 @media (max-width: 950px) { .crm-main { grid-template-columns: 65px minmax(0, 1fr); }.crm-sidebar { padding: 20px 7px 12px; align-items: center; }.sidebar-label, .sidebar-link:not(.active) { font-size: 0; }.sidebar-link { width: 48px; justify-content: center; padding: 11px 4px; }.sidebar-link > span { font-size: 16px; }.sidebar-link b, .sidebar-bottom > span:last-child { display: none; }.crm-workspace { grid-template-columns: 1fr; }.lead-detail-panel { min-height: 220px; } }
 @media (max-width: 650px) { .auth-header { height: 66px; padding: 0 5%; }.auth-layout { min-height: auto; padding: 22px 5% 45px; display: block; }.auth-visual { min-height: 185px; margin-bottom: 28px; }.auth-visual > div { left: 18px; bottom: 18px; }.auth-visual h1 { font-size: 25px; letter-spacing: -1px; }.auth-card { padding: 0 4px; }.auth-card h2, .recovery-shell h1 { font-size: 31px; }.recovery-shell { margin: 35px auto; padding: 25px 20px; }.crm-page .topbar { height: 66px; padding: 0 4%; }.crm-page .nav-links { display: none; }.crm-main { grid-template-columns: 1fr; }.crm-sidebar { position: static; width: 100%; height: auto; flex-direction: row; justify-content: center; gap: 5px; padding: 7px; border-right: 0; border-bottom: 1px solid #e6ebe4; }.sidebar-link { width: auto; margin: 0; padding: 8px 10px; font-size: 8px !important; }.sidebar-link > span { font-size: 12px; }.sidebar-bottom { display: none; }.crm-content { padding: 27px 4% 40px; }.crm-title-row { display: block; }.demo-badge { margin-top: 14px; }.crm-metrics { grid-template-columns: 1fr 1fr; gap: 8px; }.metric-card { min-height: 100px; padding: 12px; }.metric-card strong { font-size: 23px; }.crm-panel { padding: 14px 11px; }.crm-panel-head { align-items: flex-start; }.crm-search input { width: 85px; }.lead-row { gap: 7px; }.lead-row-meta { min-width: 77px; } }
+@media (max-width: 650px) { .login-page .auth-layout { margin: 22px 4%; padding: 19px; }.login-page .auth-visual { margin-bottom: 19px; } }
 
 /* Visual refinement: warmer palette, clearer type, quieter decoration. */
 :root {
@@ -507,7 +518,7 @@ body { background: var(--cream); color: var(--ink); font-size: 15px; }
 .auth-card h2, .recovery-shell h1 { letter-spacing: -1.2px; }
 .auth-card > p, .recovery-shell > p { font-size: 12px; }
 .auth-form > label { font-size: 10px; }
-.auth-form input:not([type=checkbox]) { border-radius: 2px; font-size: 12px; }
+.auth-form input:not([type=checkbox]) { border-radius: 3px; font-size: 12px; }
 .auth-foot, .auth-inline a { font-size: 11px !important; }
 .crm-title-row h1 { letter-spacing: -1.4px; }
 .metric-card { border-color: #e9e8e1; border-radius: 3px; }
