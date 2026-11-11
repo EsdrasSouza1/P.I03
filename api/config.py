@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 try:
     from dotenv import load_dotenv
@@ -8,6 +9,19 @@ except ImportError as e:
     print(f"Error loading env: {e}")
 
 class Config:
-    SECRET_KEY = timedelta(days=30)
-    MONGO_DB_SETTINGS = 
-    REMEMBER_COOKIE_DURATION = 
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'sua-chave-secreta-padrao')
+    MONGO_URI = os.environ.get('MONGO_URI')
+    MONGO_DB = os.environ.get('MONGO_DB', 'imobiliaria_db')
+    PERMANENT_SESSION_LIFETIME = timedelta(days=30)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    REMEMBER_COOKIE_DURATION = timedelta(days=30)
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax'
+    TOKEN_EXPIRATION_SECONDS = int(os.environ.get('TOKEN_EXPIRATION_SECONDS', 86400))
+    REMEMBER_TOKEN_EXPIRATION_SECONDS = int(os.environ.get('REMEMBER_TOKEN_EXPIRATION_SECONDS', 2592000))
+    CORS_ORIGINS = [
+        origin.strip()
+        for origin in os.environ.get('CORS_ORIGINS', '').split(',')
+        if origin.strip()
+    ]
