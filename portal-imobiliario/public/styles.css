@@ -593,6 +593,18 @@ body { background: var(--cream); color: var(--ink); font-size: 15px; }
 .add-property-button { min-height: 42px; gap: 8px; border: 1px solid #d8d9d0; border-radius: 3px; background: transparent; color: var(--ink); font-size: 12px; }
 .add-property-button:hover { background: #f3f6f1; }
 .add-property-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.user-row { grid-template-columns: 58px minmax(0, 1fr) auto; }
+.user-avatar { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: var(--sage); color: var(--green-dark); font: 700 17px var(--display); }
+.user-dialog { width: min(620px, calc(100% - 28px)); padding: 0; overflow: hidden; border: 0; border-radius: 3px; background: #fff; color: var(--ink); box-shadow: 0 28px 90px #17221945; }
+.user-dialog::backdrop { background: #172219a6; }
+.user-form { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px 13px; }
+.user-form label { color: #758078; font-size: 10px; }
+.user-form input { display: block; width: 100%; margin-top: 6px; padding: 12px; border: 1px solid #e5eae3; border-radius: 3px; outline-color: #8fa68f; color: #34453a; font-size: 12px; }
+.user-form .wide { grid-column: 1 / -1; }
+.user-form > small { color: #858d86; font-size: 10px; }
+.user-form .form-actions > div { display: flex; gap: 8px; }
+.user-form .button { margin: 0; border-radius: 3px; }
+.error-text { color: #a75151; }
 .property-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 13px; }
 .property-form label { display: block; min-width: 0; color: #758078; font-size: 9px; }
 .property-form label.wide, .property-form .wide { grid-column: 1 / -1; }
@@ -700,4 +712,8 @@ body { background: var(--cream); color: var(--ink); font-size: 15px; }
   .carousel-controls .button { width: 100%; justify-content: center; }
   .admin-label { display: none; }
   .detail-image { height: 185px; }
+  .user-form { grid-template-columns: 1fr; padding: 18px 14px; }
+  .user-form label, .user-form .wide { grid-column: 1; }
+  .user-form .form-actions { align-items: stretch; flex-direction: column; }
+  .user-form .form-actions > div { justify-content: flex-end; }
 }

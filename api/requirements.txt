@@ -1,0 +1,5 @@
+Flask>=3.0,<4.0
+mongoengine>=0.29,<1.0
+pymongo[srv]>=4.8,<5.0
+python-dotenv>=1.0,<2.0
+email-validator>=2.2,<3.0

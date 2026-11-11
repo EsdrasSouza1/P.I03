@@ -83,12 +83,6 @@ function validateLoginInputs(form) {
     return { valid: false, error: 'Informe sua senha.' };
   }
 
-  if (senha.length < 8) {
-    setFieldInvalid(senhaInput, true);
-    senhaInput?.focus();
-    return { valid: false, error: 'A senha deve ter pelo menos 8 caracteres.' };
-  }
-
   return { valid: true, payload: { email, senha, lembrar } };
 }
 

@@ -10,8 +10,8 @@ except ImportError as e:
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'sua-chave-secreta-padrao')
-    MONGO_URI = os.environ.get('MONGO_URI')
-    MONGO_DB = os.environ.get('MONGO_DB', 'imobiliaria_db')
+    MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017')
+    MONGO_DB = os.environ.get('MONGO_DB', 'portal_imobiliario')
     PERMANENT_SESSION_LIFETIME = timedelta(days=30)
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
