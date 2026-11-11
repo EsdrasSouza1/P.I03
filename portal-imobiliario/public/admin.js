@@ -37,6 +37,9 @@ const list = document.querySelector('#admin-property-list');
 const message = document.querySelector('#form-message');
 const photoInput = document.querySelector('#property-photos');
 const photoSelection = document.querySelector('#photo-selection');
+const propertyFilter = document.querySelector('#property-filter');
+const editPropertyDialog = document.querySelector('#edit-property-dialog');
+const livePreview = document.querySelector('#admin-live-preview');
 const carouselDialog = document.querySelector('#carousel-dialog');
 const carouselCanvas = document.querySelector('#carousel-canvas');
 const carouselContext = carouselCanvas.getContext('2d');
@@ -44,6 +47,8 @@ let carouselProperty = null;
 let carouselPhotos = [];
 let carouselSlideIndex = 0;
 let editingId = null;
+let livePreviewPhotoUrls = [];
+let livePreviewGalleryIndex = 0;
 const propertiesKey = 'bartarin-properties-v4';
 function readProperties() {
   try {
@@ -86,10 +91,20 @@ function readPayload() {
   };
 }
 
-function clearMessage() { message.textContent = ''; message.classList.remove('error'); }
-function showMessage(text, isError = false) { message.textContent = text; message.classList.toggle('error', isError); }
+function clearMessage() { if (message) { message.textContent = ''; message.classList.remove('error'); } }
+function showMessage(text, isError = false) {
+  if (!message) {
+    if (isError) window.alert(text);
+    return;
+  }
+  message.textContent = text;
+  message.classList.toggle('error', isError);
+}
 
 function resetForm() {
+  livePreviewPhotoUrls.forEach(url => URL.revokeObjectURL(url));
+  livePreviewPhotoUrls = [];
+  livePreviewGalleryIndex = 0;
   editingId = null;
   form.reset();
   form.elements.namedItem('cidade').value = 'Araras';
@@ -101,9 +116,13 @@ function resetForm() {
   document.querySelector('#submit-label').textContent = 'Cadastrar imóvel';
   document.querySelector('#cancel-edit').classList.add('hidden');
   clearMessage();
+  editPropertyDialog?.close();
 }
 
 function startEdit(item) {
+  livePreviewPhotoUrls.forEach(url => URL.revokeObjectURL(url));
+  livePreviewPhotoUrls = [];
+  livePreviewGalleryIndex = 0;
   editingId = item._id;
   form.elements.namedItem('titulo').value = item.titulo || '';
   typeSelect.value = item.tipo;
@@ -120,22 +139,91 @@ function startEdit(item) {
   document.querySelector('#submit-label').textContent = 'Salvar alterações';
   document.querySelector('#cancel-edit').classList.remove('hidden');
   clearMessage();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderLivePreview();
+  editPropertyDialog?.showModal();
+}
+
+function startCreate() {
+  resetForm();
+  document.querySelector('#form-title').textContent = 'Novo imóvel';
+  document.querySelector('#submit-label').textContent = 'Cadastrar imóvel';
+  document.querySelector('#cancel-edit').classList.remove('hidden');
+  renderLivePreview();
+  editPropertyDialog?.showModal();
 }
 
 function propertyCard(item) {
   const location = [item.localizacao?.bairro, item.localizacao?.cidade].filter(Boolean).join(', ');
-  return `<article class="admin-property"><div class="admin-property-info"><span class="admin-property-type">${escapeHtml(typeLabel(item.tipo))} · Venda</span><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(location)} · ${formatMoney(item.preco)}</p></div><div class="admin-property-actions"><button class="quiet-button carousel-property" data-id="${escapeHtml(item._id)}" type="button">Criar carrossel</button><button class="quiet-button edit-property" data-id="${escapeHtml(item._id)}" type="button">Editar</button><button class="quiet-button archive-property" data-id="${escapeHtml(item._id)}" type="button">Arquivar</button></div></article>`;
+  const firstPhoto = item.images?.[0]?.thumb || item.images?.[0]?.src || item.image || '';
+  const thumbnail = firstPhoto
+    ? `<img src="${escapeHtml(firstPhoto)}" alt="Miniatura de ${escapeHtml(item.titulo)}" loading="lazy">`
+    : '<span>Sem imagem</span>';
+  return `<article class="admin-property"><div class="admin-property-thumb">${thumbnail}</div><div class="admin-property-info"><span class="admin-property-type">${escapeHtml(typeLabel(item.tipo))} · Venda</span><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(location)} · ${formatMoney(item.preco)}</p></div><div class="admin-property-actions"><button class="quiet-button carousel-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Criar carrossel" title="Criar carrossel"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="15" height="15" rx="2"/><path d="m7 15 3-3 4 4 2-2 2 2"/><path d="M7 9h.01"/><path d="M8 2h11a3 3 0 0 1 3 3v11"/></svg></button><button class="quiet-button edit-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Editar imóvel" title="Editar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button><button class="quiet-button archive-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Arquivar imóvel" title="Arquivar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M5 7l1 14h12l1-14"/><path d="M9 11v6M15 11v6"/><path d="M8 7V3h8v4"/></svg></button></div></article>`;
+}
+
+function renderLivePreview() {
+  if (!form || !livePreview) return;
+  const current = properties.find(property => String(property._id) === String(editingId)) || {};
+  const data = new FormData(form);
+  const title = data.get('titulo') || 'Título do imóvel';
+  const type = data.get('tipo') || current.tipo || 'casa';
+  const price = Number(data.get('preco')) || 0;
+  const city = data.get('cidade') || 'Araras';
+  const neighborhood = data.get('bairro') || 'Bairro';
+  const state = data.get('uf') || 'SP';
+  const description = data.get('descricao') || 'A descrição do imóvel aparecerá aqui para o cliente.';
+  const savedPhotos = current.images || (current.image ? [{ src: current.image, thumb: current.image }] : []);
+  const photos = livePreviewPhotoUrls.length
+    ? livePreviewPhotoUrls.map(src => ({ src, thumb: src }))
+    : savedPhotos;
+  livePreviewGalleryIndex = Math.min(livePreviewGalleryIndex, Math.max(0, photos.length - 1));
+  const mainPhoto = photos[livePreviewGalleryIndex]?.src || photos[livePreviewGalleryIndex]?.thumb || '';
+  const image = mainPhoto
+    ? `<img class="detail-image" src="${escapeHtml(mainPhoto)}" alt="${escapeHtml(title)} — foto ${livePreviewGalleryIndex + 1} de ${photos.length}">`
+    : '<div class="live-preview-empty">A foto principal aparecerá aqui</div>';
+  const details = typeFields[type].map(field => {
+    const input = form.elements.namedItem(field.name);
+    if (!input) return '';
+    const value = field.type === 'checkbox' ? (input.checked ? 'Sim' : 'Não') : input.value;
+    return value ? `<div><dt>${escapeHtml(field.label)}</dt><dd>${escapeHtml(value)}</dd></div>` : '';
+  }).join('');
+  const encodedPlace = encodeURIComponent(`${neighborhood}, ${city}, ${state}`);
+  const galleryControls = photos.length > 1 ? `<button type="button" class="gallery-nav gallery-previous" data-live-gallery-step="-1" aria-label="Foto anterior">‹</button><button type="button" class="gallery-nav gallery-next" data-live-gallery-step="1" aria-label="Próxima foto">›</button><span class="gallery-counter">${livePreviewGalleryIndex + 1} / ${photos.length}</span>` : '';
+  const thumbnails = photos.map((photo, index) => `<button type="button" class="gallery-thumb ${index === livePreviewGalleryIndex ? 'active' : ''}" data-live-gallery-index="${index}" aria-label="Mostrar foto ${index + 1}"><img src="${escapeHtml(photo.thumb || photo.src)}" alt=""></button>`).join('');
+  livePreview.innerHTML = `<div class="property-gallery"><div class="gallery-stage">${image}${mainPhoto ? '<button type="button" class="gallery-zoom-button" tabindex="-1">⌕ <span>Ampliar foto</span></button>' : ''}${galleryControls}</div>${photos.length ? `<div class="gallery-thumbnails">${thumbnails}</div>` : ''}</div><div class="admin-public-detail"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(typeLabel(type))} · VENDA · ${escapeHtml(city).toUpperCase()}</div><h2>${escapeHtml(title)}</h2><p class="detail-location">⌖ ${escapeHtml(neighborhood)}, ${escapeHtml(city)} - ${escapeHtml(state)}</p><strong class="detail-price">${formatMoney(price)}</strong><p class="detail-description">${escapeHtml(description)}</p>${details ? `<dl class="detail-specs">${details}</dl>` : ''}<section class="property-map"><div class="map-heading"><div><strong>Localização aproximada</strong><span>${escapeHtml(neighborhood)} · ${escapeHtml(city)}, ${escapeHtml(state)}</span></div><a href="https://www.google.com/maps/search/?api=1&query=${encodedPlace}" target="_blank" rel="noopener">Abrir no Google Maps ↗</a></div><iframe src="https://maps.google.com/maps?q=${encodedPlace}&output=embed" title="Mapa aproximado de ${escapeHtml(neighborhood)}" loading="lazy"></iframe><small>O mapa indica o bairro. Para preservar a privacidade, o endereço exato é informado pelo corretor.</small></section></div>`;
 }
 
 function refreshProperties() {
   properties = readProperties();
+  const keyword = normalizeSearch(propertyFilter?.value || '');
   const active = properties.filter(item => item.status !== 'arquivado');
-  list.innerHTML = active.length ? active.map(propertyCard).join('') : '<div class="admin-empty">Nenhum imóvel ativo nesta demonstração.</div>';
+  const filtered = keyword ? active.filter(item => searchableProperty(item).includes(keyword)) : active;
+  list.innerHTML = filtered.length
+    ? filtered.map(propertyCard).join('')
+    : `<div class="admin-empty">${keyword ? 'Nenhum imóvel encontrado para esta palavra-chave.' : 'Nenhum imóvel ativo nesta demonstração.'}</div>`;
 }
 
-typeSelect.addEventListener('change', () => renderDetailFields());
-photoInput.addEventListener('change', () => {
+function normalizeSearch(value) {
+  return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+}
+
+function searchableProperty(item) {
+  const values = [];
+  const collect = (value, key = '') => {
+    if (['image', 'images', 'src', 'thumb'].includes(key)) return;
+    if (Array.isArray(value)) value.forEach(entry => collect(entry, key));
+    else if (value && typeof value === 'object') Object.entries(value).forEach(([childKey, childValue]) => collect(childValue, childKey));
+    else values.push(value);
+  };
+  collect(item);
+  values.push(typeLabel(item.tipo), formatMoney(item.preco));
+  return normalizeSearch(values.join(' '));
+}
+
+typeSelect?.addEventListener('change', () => renderDetailFields());
+form?.addEventListener('input', renderLivePreview);
+form?.addEventListener('change', renderLivePreview);
+photoInput?.addEventListener('change', () => {
   const selected = [...photoInput.files];
   if (selected.length > 8) {
     showMessage('Escolha no máximo 8 fotos por imóvel.', true);
@@ -143,11 +231,29 @@ photoInput.addEventListener('change', () => {
     photoSelection.textContent = 'Nenhuma foto selecionada';
     return;
   }
+  livePreviewPhotoUrls.forEach(url => URL.revokeObjectURL(url));
+  livePreviewPhotoUrls = selected.map(file => URL.createObjectURL(file));
+  livePreviewGalleryIndex = 0;
+  renderLivePreview();
   photoSelection.textContent = selected.length ? `${selected.length} ${selected.length === 1 ? 'foto selecionada' : 'fotos selecionadas'}` : 'Nenhuma foto selecionada';
   clearMessage();
 });
-document.querySelector('#cancel-edit').addEventListener('click', resetForm);
+document.querySelector('#cancel-edit')?.addEventListener('click', resetForm);
+document.querySelector('#close-property-editor')?.addEventListener('click', resetForm);
+editPropertyDialog?.addEventListener('click', event => { if (event.target === editPropertyDialog) resetForm(); });
+livePreview?.addEventListener('click', event => {
+  const thumbnail = event.target.closest('[data-live-gallery-index]');
+  const stepButton = event.target.closest('[data-live-gallery-step]');
+  if (thumbnail) livePreviewGalleryIndex = Number(thumbnail.dataset.liveGalleryIndex);
+  else if (stepButton) {
+    const count = livePreview.querySelectorAll('[data-live-gallery-index]').length;
+    livePreviewGalleryIndex = (livePreviewGalleryIndex + Number(stepButton.dataset.liveGalleryStep) + count) % count;
+  } else return;
+  renderLivePreview();
+});
 document.querySelector('#refresh-list').addEventListener('click', refreshProperties);
+document.querySelector('#add-property')?.addEventListener('click', startCreate);
+propertyFilter?.addEventListener('input', refreshProperties);
 document.querySelector('#close-carousel').addEventListener('click', () => carouselDialog.close());
 carouselDialog.addEventListener('click', event => { if (event.target === carouselDialog) carouselDialog.close(); });
 document.querySelector('#carousel-previous').addEventListener('click', () => showCarouselSlide(carouselSlideIndex - 1));
@@ -206,7 +312,7 @@ function preparePayload(payload, uploadedPhotos) {
     ...(images.length ? { images, image: images[0].src } : {})
   };
 }
-form.addEventListener('submit', async event => {
+form?.addEventListener('submit', async event => {
   event.preventDefault();
   clearMessage();
   const submitButton = form.querySelector('button[type="submit"]');
@@ -238,8 +344,9 @@ form.addEventListener('submit', async event => {
 list.addEventListener('click', async event => {
   const editButton = event.target.closest('.edit-property');
   if (editButton) {
-    const item = properties.find(property => property._id === editButton.dataset.id);
-    if (item) startEdit(item);
+    const item = properties.find(property => String(property._id) === editButton.dataset.id);
+    if (item && form) startEdit(item);
+    else if (item) window.alert('A edição do imóvel será aberta em uma nova tela.');
     return;
   }
   const carouselButton = event.target.closest('.carousel-property');
@@ -257,7 +364,7 @@ list.addEventListener('click', async event => {
   refreshProperties();
 });
 
-renderDetailFields();
+if (form) renderDetailFields();
 refreshProperties();
 
 function propertyPhotos(item) {

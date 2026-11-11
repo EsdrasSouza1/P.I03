@@ -11,28 +11,34 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a href="/crm.html">CRM</a><a href="/">Ver portal ↗</a></nav><span class="admin-label">ÁREA DE GESTÃO · DESENVOLVIMENTO</span></header>
+  <header class="topbar"><a class="brand" href="/admin.html"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><nav class="nav-links"><a class="active" href="/admin.html">Imóveis</a></nav><span class="admin-label">ÁREA DE GESTÃO · DESENVOLVIMENTO</span></header>
   <main class="admin-page">
-    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE IMÓVEIS</div><h1>Gerencie seus <em>espaços.</em></h1><p>Cadastre imóveis e informe os detalhes próprios de cada categoria.</p></div><span class="connection-pill local-demo" id="connection-status">Demonstração local</span></section>
+    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE IMÓVEIS</div><h1>Gerencie seus <em>espaços.</em></h1><p>Consulte o catálogo e gerencie os imóveis disponíveis.</p></div><span class="connection-pill local-demo" id="connection-status">Demonstração local</span></section>
     <div class="admin-layout">
-      <section class="admin-panel"><div class="panel-heading"><div><span class="panel-kicker">CADASTRO</span><h2 id="form-title">Novo imóvel</h2></div><button class="quiet-button hidden" id="cancel-edit" type="button">Cancelar edição</button></div>
-        <form id="property-form" class="property-form">
-          <label class="wide">Título do anúncio<input name="titulo" required maxlength="120" placeholder="Ex.: Casa com quintal no Centro"></label>
-          <label>Tipo<select name="tipo" id="property-type" required><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="casa_condominio">Casa em condomínio</option><option value="chacara">Chácara</option><option value="comercial">Sala comercial</option><option value="galpao">Galpão</option><option value="terreno">Terreno</option></select></label>
-          <label>Preço (R$)<input name="preco" type="number" min="1" step="0.01" required placeholder="250000"></label>
-          <label>Cidade<input name="cidade" required value="Araras" readonly></label>
-          <label>Bairro<input name="bairro" required maxlength="80" placeholder="Centro"></label>
-          <label>Estado (UF)<input name="uf" required value="SP" readonly></label>
-          <div class="wide"><div class="detail-heading"><span class="panel-kicker">CAMPOS ESPECÍFICOS</span><span id="detail-hint">Apartamento</span></div><div id="detail-fields" class="detail-fields"></div></div>
-          <label class="wide">Descrição<textarea name="descricao" rows="4" maxlength="1800" placeholder="Descreva o imóvel..."></textarea></label>
-          <label class="wide photo-upload-label">Fotos do imóvel<input id="property-photos" name="fotos" type="file" accept="image/*" multiple><small>Selecione até 8 fotos. Guardamos uma versão otimizada de até 2048 px para a galeria e o carrossel, além de miniaturas leves para o catálogo.</small><span id="photo-selection" class="photo-selection">Nenhuma foto selecionada</span></label>
-          <div class="form-actions wide"><p class="form-message" id="form-message" aria-live="polite"></p><button class="button button-dark" type="submit"><span id="submit-label">Cadastrar imóvel</span><b>↗</b></button></div>
-        </form>
-      </section>
-      <section class="admin-panel listing-panel"><div class="panel-heading"><div><span class="panel-kicker">CATÁLOGO</span><h2>Imóveis cadastrados</h2></div><button id="refresh-list" class="quiet-button" type="button">Atualizar ↻</button></div><div id="admin-property-list" class="admin-property-list"><div class="admin-empty">Carregando imóveis…</div></div></section>
+      <section class="admin-panel listing-panel"><div class="panel-heading"><div><span class="panel-kicker">CATÁLOGO</span><h2>Imóveis cadastrados</h2></div><div class="catalog-tools"><label class="catalog-filter"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="property-filter" type="search" placeholder="Filtrar por palavra-chave" aria-label="Filtrar imóveis por palavra-chave"></label><button id="refresh-list" class="button refresh-button" type="button">Atualizar <span>↻</span></button><button id="add-property" class="button add-property-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar</button></div></div><div id="admin-property-list" class="admin-property-list"><div class="admin-empty">Carregando imóveis…</div></div></section>
     </div>
     <p class="admin-note">Demonstração de frontend: os imóveis de exemplo e as alterações ficam salvos somente neste navegador. Não existe login ou banco de dados conectado.</p>
   </main>
+  <dialog id="edit-property-dialog" class="edit-property-dialog">
+    <div class="edit-workspace-heading"><div><span class="panel-kicker">EDIÇÃO DO IMÓVEL</span><h2 id="form-title">Editar imóvel</h2></div><button class="quiet-button" id="close-property-editor" type="button" aria-label="Fechar edição">Fechar ✕</button></div>
+    <div class="edit-workspace">
+      <section class="edit-form-panel">
+        <form id="property-form" class="property-form">
+          <label class="wide">Título do anúncio<input name="titulo" required maxlength="120" placeholder="Ex.: Casa com quintal no Centro"></label>
+          <label>Tipo<select name="tipo" id="property-type" required><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="casa_condominio">Casa em condomínio</option><option value="chacara">Chácara</option><option value="comercial">Sala comercial</option><option value="galpao">Galpão</option><option value="terreno">Terreno</option></select></label>
+          <label>Preço (R$)<input name="preco" type="number" min="1" step="0.01" required></label>
+          <label>Cidade<input name="cidade" required value="Araras" readonly></label>
+          <label>Bairro<input name="bairro" required maxlength="80"></label>
+          <label>Estado (UF)<input name="uf" required value="SP" readonly></label>
+          <div class="wide"><div class="detail-heading"><span class="panel-kicker">CAMPOS ESPECÍFICOS</span><span id="detail-hint">Apartamento</span></div><div id="detail-fields" class="detail-fields"></div></div>
+          <label class="wide">Descrição<textarea name="descricao" rows="5" maxlength="1800"></textarea></label>
+          <label class="wide photo-upload-label">Fotos do imóvel<input id="property-photos" name="fotos" type="file" accept="image/*" multiple><small>Selecione novas fotos somente se quiser substituir a galeria atual.</small><span id="photo-selection" class="photo-selection">Nenhuma foto selecionada</span></label>
+          <div class="form-actions wide"><p class="form-message" id="form-message" aria-live="polite"></p><div><button class="button button-outline" id="cancel-edit" type="button">Cancelar</button><button class="button button-dark" type="submit"><span id="submit-label">Salvar alterações</span><b>↗</b></button></div></div>
+        </form>
+      </section>
+      <section class="live-preview-panel"><div class="preview-label"><span>PRÉVIA PARA O CLIENTE</span><small>Atualização em tempo real</small></div><div id="admin-live-preview" class="admin-live-preview"></div></section>
+    </div>
+  </dialog>
   <dialog id="carousel-dialog" class="carousel-dialog">
     <div class="carousel-heading"><div><span class="panel-kicker">CONTEÚDO PARA REDES SOCIAIS</span><h2>Carrossel para Instagram</h2></div><button class="quiet-button" id="close-carousel" type="button" aria-label="Fechar">Fechar ✕</button></div>
     <p class="carousel-help">Artes verticais 4:5 (1080 × 1350). Baixe cada slide em PNG e publique na ordem indicada. São usadas até 8 fotos do imóvel.</p>
