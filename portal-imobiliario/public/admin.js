@@ -49,13 +49,30 @@ let carouselSlideIndex = 0;
 let editingId = null;
 let livePreviewPhotoUrls = [];
 let livePreviewGalleryIndex = 0;
-const propertiesKey = 'bartarin-properties-v4';
+const propertiesKey = 'bartarin-properties-v6';
+const localImageByType = { apartamento: '/images/imoveis/imovel-50fa959b6065-marca.jpg', casa: '/images/imoveis/imovel-16e34c371fd4-marca.jpg', casa_condominio: '/images/imoveis/imovel-11240da37542-marca.jpg', chacara: '/images/imoveis/imovel-d9407043e6ce-marca.jpg', comercial: '/images/imoveis/imovel-4d4a604e21fd-marca.jpg', galpao: '/images/imoveis/imovel-4d4a604e21fd-marca.jpg', terreno: '/images/imoveis/imovel-e60279237c21-marca.jpg' };
+function migrateRemotePhotos(items) {
+  let changed = false;
+  const migrated = items.map(item => {
+    const photos = [...(Array.isArray(item.images) ? item.images : []), ...(item.image ? [{ src: item.image, thumb: item.image }] : [])];
+    if (!photos.some(photo => /^https?:\/\//i.test(photo?.src || photo?.thumb || ''))) return item;
+    changed = true;
+    const localPhotos = photos.filter(photo => [photo?.src, photo?.thumb].some(value => value?.startsWith('data:image/') || value?.startsWith('/images/')));
+    const image = localPhotos[0]?.src || localImageByType[item.tipo] || '/images/imoveis/imovel-16e34c371fd4-marca.jpg';
+    return { ...item, image, images: localPhotos.length ? localPhotos : [{ src: image, thumb: image }] };
+  });
+  return { items: migrated, changed };
+}
 function readProperties() {
   try {
     const saved = JSON.parse(localStorage.getItem(propertiesKey) || 'null');
-    if (Array.isArray(saved)) return saved;
+    if (Array.isArray(saved)) {
+      const result = migrateRemotePhotos(saved);
+      if (result.changed) localStorage.setItem(propertiesKey, JSON.stringify(result.items));
+      return result.items;
+    }
   } catch { localStorage.removeItem(propertiesKey); }
-  const initial = structuredClone(window.BartarinDemoProperties || []);
+  const initial = migrateRemotePhotos(structuredClone(window.BartarinDemoProperties || [])).items;
   localStorage.setItem(propertiesKey, JSON.stringify(initial));
   return initial;
 }
@@ -374,7 +391,7 @@ function propertyPhotos(item) {
 
 function carouselImageUrl(url) {
   if (url.startsWith('data:') || url.startsWith('/')) return url;
-  return `/_image?url=${encodeURIComponent(url)}`;
+  return '/images/imoveis/imovel-16e34c371fd4-marca.jpg';
 }
 
 function loadCarouselImage(url) {

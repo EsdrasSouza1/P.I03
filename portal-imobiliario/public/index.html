@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7f3">
+  <meta name="theme-color" content="#edf1e9">
   <title>Bartarin Imóveis — encontre seu próximo lugar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=brand-4">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#inicio" aria-label="Bartarin Imóveis início"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a>
+    <a class="brand" href="#inicio" aria-label="Bartarin Imóveis início"><img class="brand-logo" src="images/logo.png?v=brand-3" alt="Logo Bartarin"></a>
     <nav class="nav-links" aria-label="Navegação"><a class="active" href="#imoveis">Imóveis</a><a href="#sobre">Sobre nós</a><a href="#contato">Contato</a><a href="/login.html">Área da equipe</a></nav>
     <a class="button header-login" href="/login.html">
       <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
@@ -29,10 +29,10 @@
         <div class="hero-note"><span class="location-mark">⌖</span><span>Busca simples, com opções por tipo, bairro e faixa de preço.</span></div>
       </div>
         <div class="hero-visual">
-        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1300&q=85" alt="Casa contemporânea rodeada por jardim" fetchpriority="high">
-        <div class="image-caption"><span class="caption-dot"></span><span>Imagem ilustrativa</span></div>
+        <img src="/images/imoveis/imovel-7a2146ebe6c1-marca.jpg" alt="Casa anunciada por R$ 1.300.000 em Araras, SP" fetchpriority="high">
+        <div class="image-caption"><span class="caption-dot"></span><span>Foto de im?vel anunciado</span></div>
         <div class="floating-card"><span class="floating-icon">⌖</span><span><small>Atendimento local</small><strong>Araras, SP</strong></span></div>
-        <span class="visual-index">FOTO ILUSTRATIVA</span>
+        <span class="visual-index">IM?VEIS EM ARARAS</span>
       </div>
       <div class="hero-vertical">ESPAÇOS PENSADOS PARA VOCÊ <span></span> 2026</div>
     </section>
@@ -49,18 +49,19 @@
     </section>
 
     <section class="listings section" id="imoveis">
-      <div class="section-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> BARTARIN IMÓVEIS · ARARAS</div><h2>Imóveis à <em>venda.</em></h2><p>Catálogo com os anúncios públicos disponíveis no site da imobiliária.</p><p class="demo-note" id="catalogue-note">77 anúncios consultados em 01/11/2026. Fotos e fichas levam ao site de origem; confirme preço e disponibilidade com a equipe.</p></div><button class="text-link favorites-toggle" id="favorites-toggle" type="button">Ver favoritos ♡</button></div>
-      <div class="filters" role="group" aria-label="Filtrar por tipo"><button class="filter-chip selected" data-type="">Todos <span>↗</span></button><button class="filter-chip" data-type="casa">Casas</button><button class="filter-chip" data-type="apartamento">Apartamentos</button><button class="filter-chip" data-type="casa_condominio">Casas em condomínio</button><button class="filter-chip" data-type="chacara">Chácaras</button><button class="filter-chip" data-type="comercial">Salas comerciais</button><button class="filter-chip" data-type="galpao">Galpões</button><button class="filter-chip" data-type="terreno">Terrenos</button></div>
-      <div class="results-row"><span id="results-count" aria-live="polite"></span><button type="button" id="clear-search" class="clear-search">Limpar filtros</button></div>
+      <div class="section-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> BARTARIN IMÓVEIS · ARARAS</div><h2>Imóveis à <em>venda.</em></h2><p>Catálogo demonstrativo com dados consultados no site da imobiliária.</p><p class="demo-note" id="catalogue-note">Fotos e descri&#231;&#245;es dos an&#250;ncios p&#250;blicos da imobili&#225;ria, salvas localmente. Consulte a ficha original para confirmar pre&#231;o e disponibilidade.</p></div><button class="text-link favorites-toggle" id="favorites-toggle" type="button" aria-pressed="false">Ver favoritos ♡</button></div>
+      <div class="filters" role="group" aria-label="Filtrar por tipo"><button type="button" class="filter-chip selected" data-type="" aria-pressed="true">Todos <span>↗</span></button><button type="button" class="filter-chip" data-type="casa" aria-pressed="false">Casas</button><button type="button" class="filter-chip" data-type="apartamento" aria-pressed="false">Apartamentos</button><button type="button" class="filter-chip" data-type="casa_condominio" aria-pressed="false">Casas em condomínio</button><button type="button" class="filter-chip" data-type="chacara" aria-pressed="false">Chácaras</button><button type="button" class="filter-chip" data-type="comercial" aria-pressed="false">Salas comerciais</button><button type="button" class="filter-chip" data-type="galpao" aria-pressed="false">Galpões</button><button type="button" class="filter-chip" data-type="terreno" aria-pressed="false">Terrenos</button></div>
+      <div class="results-row"><span id="results-count" aria-live="polite"></span><div class="results-actions"><label for="sort-order">Ordenar por <select id="sort-order"><option value="recentes">Mais recentes</option><option value="preco-menor">Menor preço</option><option value="preco-maior">Maior preço</option></select></label><button type="button" id="clear-search" class="clear-search">Limpar filtros</button></div></div>
       <div class="property-grid" id="property-grid" aria-live="polite"><div class="loading-card">Carregando espaços...</div></div>
+      <nav id="catalogue-pagination" class="catalogue-pagination" aria-label="Páginas do catálogo"></nav>
     </section>
 
-    <section class="about section" id="sobre"><div class="about-image"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85" alt="Interior residencial, imagem ilustrativa" loading="lazy"><span class="image-tag">IMAGEM ILUSTRATIVA</span></div><div class="about-copy"><div class="eyebrow"><span class="eyebrow-line"></span> SOBRE O PROJETO</div><h2>Uma busca mais<br>clara por <em>imóveis.</em></h2><p>Este protótipo reúne busca, anúncios e uma área de demonstração para gestão de imóveis e contatos.</p><p>O catálogo mostra os anúncios públicos de venda consultados no site em 1º de novembro de 2026. Preços e disponibilidade podem mudar; confirme os dados na ficha original.</p><a class="button button-dark" href="/admin.html">Conhecer a gestão</a></div></section>
+    <section class="about section" id="sobre"><div class="about-image"><img src="/images/imoveis/imovel-c1d6bf8244b1-marca.jpg" alt="Casa anunciada por R$ 1.200.000 em Araras, SP" loading="lazy" decoding="async"></div><div class="about-copy"><div class="eyebrow"><span class="eyebrow-line"></span> SOBRE O PROJETO</div><h2>Uma busca mais<br>clara por <em>imóveis.</em></h2><p>Este protótipo reúne busca, anúncios e uma área de demonstração para gestão de imóveis e contatos.</p><p>O catálogo mostra os anúncios públicos de venda consultados no site em 1º de novembro de 2026. Preços e disponibilidade podem mudar; confirme os dados na ficha original.</p><a class="button button-dark" href="/admin.html">Conhecer a gestão</a></div></section>
 
     <section class="contact-banner" id="contato"><div><div class="eyebrow light"><span class="eyebrow-line"></span> DEMONSTRAÇÃO</div><h2>Quer ver como funciona<br>o contato de um <em>cliente?</em></h2><p>O formulário abaixo é ilustrativo e não envia seus dados.</p></div><button class="button button-light" id="open-lead-2">Abrir formulário</button><span class="banner-ornament">⌂</span></section>
   </main>
 
-  <footer class="footer"><a class="brand" href="#inicio"><span class="brand-mark">B</span><span>bartarin<span class="brand-dot">.</span><small class="brand-subtitle">IMÓVEIS · ARARAS</small></span></a><span>Protótipo acadêmico · catálogo demonstrativo</span><span>© 2026 Bartarin Imóveis</span></footer>
+  <footer class="footer"><a class="brand" href="#inicio"><img class="brand-logo" src="images/logo.png?v=brand-3" alt="Logo Bartarin"></a><span>Protótipo acadêmico · catálogo demonstrativo</span><span>© 2026 Bartarin Imóveis</span></footer>
 
   <dialog id="property-dialog" class="dialog property-dialog"><form method="dialog" class="dialog-close"><button aria-label="Fechar">×</button></form><div id="property-detail"></div><button type="button" class="button button-dark" id="interest-from-detail">Tenho interesse neste imóvel <span>↗</span></button></dialog>
   <dialog id="image-viewer" class="image-viewer"><button type="button" class="image-viewer-close" data-image-close aria-label="Fechar imagem ampliada">×</button><button type="button" class="image-viewer-nav image-viewer-previous" data-image-step="-1" aria-label="Foto anterior">‹</button><figure><img id="image-viewer-photo" alt=""><figcaption id="image-viewer-caption"></figcaption></figure><button type="button" class="image-viewer-nav image-viewer-next" data-image-step="1" aria-label="Próxima foto">›</button></dialog>
