@@ -34,12 +34,27 @@ const form = document.querySelector('#property-form');
 const typeSelect = document.querySelector('#property-type');
 const detailFields = document.querySelector('#detail-fields');
 const list = document.querySelector('#admin-property-list');
+const pagination = document.createElement('nav');
+pagination.id = 'admin-pagination';
+pagination.className = 'admin-pagination';
+pagination.setAttribute('aria-label', 'Paginação dos imóveis');
+list.after(pagination);
 const message = document.querySelector('#form-message');
 const photoInput = document.querySelector('#property-photos');
 const photoSelection = document.querySelector('#photo-selection');
 const propertyFilter = document.querySelector('#property-filter');
+const neighborhoodFilter = document.querySelector('#neighborhood-filter');
+const neighborhoodOptions = document.querySelector('#neighborhood-options');
+const priceMinFilter = document.querySelector('#price-min-filter');
+const priceMaxFilter = document.querySelector('#price-max-filter');
+const soldFilter = document.querySelector('#sold-filter');
 const editPropertyDialog = document.querySelector('#edit-property-dialog');
 const livePreview = document.querySelector('#admin-live-preview');
+const saleDialog = document.querySelector('#sale-dialog');
+const saleForm = document.querySelector('#sale-form');
+const saleSeller = document.querySelector('#sale-seller');
+const saleCommissionSummary = document.querySelector('#sale-commission-summary');
+const propertyCaptor = document.querySelector('#property-captor');
 const carouselDialog = document.querySelector('#carousel-dialog');
 const carouselCanvas = document.querySelector('#carousel-canvas');
 const carouselContext = carouselCanvas.getContext('2d');
@@ -47,8 +62,13 @@ let carouselProperty = null;
 let carouselPhotos = [];
 let carouselSlideIndex = 0;
 let editingId = null;
+let sellingId = null;
+let saleSellers = [];
+let propertyCaptors = [];
 let livePreviewPhotoUrls = [];
 let livePreviewGalleryIndex = 0;
+let currentPage = 1;
+const pageSize = 10;
 const propertiesKey = 'bartarin-properties-v6';
 const localImageByType = { apartamento: '/images/imoveis/imovel-50fa959b6065-marca.jpg', casa: '/images/imoveis/imovel-16e34c371fd4-marca.jpg', casa_condominio: '/images/imoveis/imovel-11240da37542-marca.jpg', chacara: '/images/imoveis/imovel-d9407043e6ce-marca.jpg', comercial: '/images/imoveis/imovel-4d4a604e21fd-marca.jpg', galpao: '/images/imoveis/imovel-4d4a604e21fd-marca.jpg', terreno: '/images/imoveis/imovel-e60279237c21-marca.jpg' };
 function migrateRemotePhotos(items) {
@@ -103,6 +123,10 @@ function readPayload() {
   }
   return {
     titulo: data.get('titulo'), tipo, finalidade: 'venda', preco: data.get('preco'),
+    percentual_comissao: Number(data.get('percentual_comissao')),
+    captador_id: String(data.get('captador_id') || ''),
+    captador_nome: propertyCaptors.find(item => String(item.id) === String(data.get('captador_id')))?.nome || '',
+    percentual_comissao_captador: Number(data.get('percentual_comissao_captador')),
     cidade: data.get('cidade'), bairro: data.get('bairro'), uf: data.get('uf'),
     descricao: data.get('descricao'), detalhes
   };
@@ -126,6 +150,8 @@ function resetForm() {
   form.reset();
   form.elements.namedItem('cidade').value = 'Araras';
   form.elements.namedItem('uf').value = 'SP';
+  form.elements.namedItem('percentual_comissao').value = '6';
+  form.elements.namedItem('percentual_comissao_captador').value = '1';
   typeSelect.value = 'apartamento';
   photoSelection.textContent = 'Nenhuma foto selecionada';
   renderDetailFields();
@@ -137,6 +163,10 @@ function resetForm() {
 }
 
 function startEdit(item) {
+  if (item.vendido) {
+    window.alert('Imóveis vendidos não podem ser alterados.');
+    return;
+  }
   livePreviewPhotoUrls.forEach(url => URL.revokeObjectURL(url));
   livePreviewPhotoUrls = [];
   livePreviewGalleryIndex = 0;
@@ -144,6 +174,8 @@ function startEdit(item) {
   form.elements.namedItem('titulo').value = item.titulo || '';
   typeSelect.value = item.tipo;
   form.elements.namedItem('preco').value = item.preco || '';
+  form.elements.namedItem('percentual_comissao').value = item.percentual_comissao ?? 6;
+  form.elements.namedItem('percentual_comissao_captador').value = item.percentual_comissao_captador ?? 1;
   form.elements.namedItem('cidade').value = item.localizacao?.cidade || '';
   form.elements.namedItem('bairro').value = item.localizacao?.bairro || '';
   form.elements.namedItem('uf').value = item.localizacao?.uf || '';
@@ -158,6 +190,7 @@ function startEdit(item) {
   clearMessage();
   renderLivePreview();
   editPropertyDialog?.showModal();
+  loadPropertyCaptors(item.captador_id);
 }
 
 function startCreate() {
@@ -167,6 +200,94 @@ function startCreate() {
   document.querySelector('#cancel-edit').classList.remove('hidden');
   renderLivePreview();
   editPropertyDialog?.showModal();
+  loadPropertyCaptors();
+}
+
+async function loadPropertyCaptors(selectedId = '') {
+  const apiBase = (window.BARTARIN_API_URL || `${window.location.protocol}//${window.location.hostname || 'localhost'}:5000`).replace(/\/$/, '');
+  const token = localStorage.getItem('bartarin-auth-token') || sessionStorage.getItem('bartarin-auth-token');
+  propertyCaptor.innerHTML = '<option value="">Carregando vendedores…</option>';
+  try {
+    const response = await fetch(`${apiBase}/vendedores?ativo=true`, { headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, credentials: 'include' });
+    const data = await response.json().catch(() => []);
+    if (!response.ok) throw new Error(data.erro || 'Não foi possível carregar os vendedores.');
+    propertyCaptors = Array.isArray(data) ? data : [];
+    propertyCaptor.innerHTML = '<option value="">Selecione o captador</option>' + propertyCaptors.map(seller => `<option value="${escapeHtml(seller.id)}">${escapeHtml(seller.nome)}</option>`).join('');
+    propertyCaptor.value = String(selectedId || '');
+  } catch (error) {
+    propertyCaptors = [];
+    propertyCaptor.innerHTML = '<option value="">Vendedores indisponíveis</option>';
+    showMessage(error.message, true);
+  }
+}
+
+const saleMoney = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
+
+function updateSaleCommissionSummary() {
+  const property = properties.find(item => String(item._id) === String(sellingId));
+  const seller = saleSellers.find(item => String(item.id) === saleSeller.value);
+  const saleValue = Number(saleForm.elements.valor_venda.value) || 0;
+  const agencyPercent = Number(property?.percentual_comissao ?? 6);
+  const sellerPercent = Number(seller?.percentual_comissao || 0);
+  const agencyCommission = saleValue * agencyPercent / 100;
+  const sellerCommission = agencyCommission * sellerPercent / 100;
+  const captorPercent = Number(property?.percentual_comissao_captador || 0);
+  const captorCommission = agencyCommission * captorPercent / 100;
+  const agencyNet = agencyCommission - sellerCommission - captorCommission;
+  saleCommissionSummary.innerHTML = `<div><span>Comissão bruta da imobiliária (${agencyPercent.toLocaleString('pt-BR')}%)</span><strong>${saleMoney(agencyCommission)}</strong></div><div><span>Captador ${escapeHtml(property?.captador_nome || '')} (${captorPercent.toLocaleString('pt-BR')}% sobre a comissão)</span><strong>${saleMoney(captorCommission)}</strong></div><div><span>Vendedor ${escapeHtml(seller?.nome || '')} (${sellerPercent.toLocaleString('pt-BR')}% sobre a comissão)</span><strong>${saleMoney(sellerCommission)}</strong></div><div><span>Saldo líquido da imobiliária</span><strong class="${agencyNet < 0 ? 'error-text' : ''}">${saleMoney(agencyNet)}</strong></div>`;
+}
+
+async function loadSaleSellers() {
+  const apiBase = (window.BARTARIN_API_URL || `${window.location.protocol}//${window.location.hostname || 'localhost'}:5000`).replace(/\/$/, '');
+  const token = localStorage.getItem('bartarin-auth-token') || sessionStorage.getItem('bartarin-auth-token');
+  const response = await fetch(`${apiBase}/vendedores?ativo=true`, { headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, credentials: 'include' });
+  const data = await response.json().catch(() => []);
+  if (!response.ok) throw new Error(data.erro || 'Não foi possível carregar os vendedores.');
+  saleSellers = Array.isArray(data) ? data : [];
+  saleSeller.innerHTML = '<option value="">Selecione o vendedor</option>' + saleSellers.map(seller => `<option value="${escapeHtml(seller.id)}">${escapeHtml(seller.nome)} · ${Number(seller.percentual_comissao).toLocaleString('pt-BR')}%</option>`).join('');
+}
+
+async function openSaleDialog(item) {
+  sellingId = item._id;
+  saleForm.reset();
+  saleForm.elements.valor_venda.value = Number(item.preco) || '';
+  const now = new Date();
+  saleForm.elements.data_venda.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  document.querySelector('#sale-property-title').textContent = item.titulo || 'Imóvel selecionado';
+  const saleMessage = document.querySelector('#sale-form-message');
+  saleMessage.textContent = '';
+  saleMessage.classList.remove('error', 'success');
+  saleDialog.showModal();
+  saleSeller.innerHTML = '<option value="">Carregando vendedores…</option>';
+  saleCommissionSummary.innerHTML = '';
+  try {
+    await loadSaleSellers();
+    if (!saleSellers.length) throw new Error('Cadastre um vendedor ativo antes de registrar a venda.');
+    updateSaleCommissionSummary();
+  } catch (error) {
+    saleMessage.textContent = error.message;
+    saleMessage.classList.add('error');
+    saleSeller.innerHTML = '<option value="">Nenhum vendedor disponível</option>';
+  }
+}
+
+function closeSaleDialog() {
+  sellingId = null;
+  if (saleDialog.open) saleDialog.close();
+}
+
+async function syncSaleWithApi(propertyId, sale) {
+  if (!/^[a-f\d]{24}$/i.test(String(propertyId))) return;
+  const apiBase = (window.BARTARIN_API_URL || `${window.location.protocol}//${window.location.hostname || 'localhost'}:5000`).replace(/\/$/, '');
+  const token = localStorage.getItem('bartarin-auth-token') || sessionStorage.getItem('bartarin-auth-token');
+  const response = await fetch(`${apiBase}/imoveis/${propertyId}/venda`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    credentials: 'include',
+    body: JSON.stringify(sale)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.erro || 'Não foi possível registrar a venda na API.');
 }
 
 function propertyCard(item) {
@@ -175,7 +296,10 @@ function propertyCard(item) {
   const thumbnail = firstPhoto
     ? `<img src="${escapeHtml(firstPhoto)}" alt="Miniatura de ${escapeHtml(item.titulo)}" loading="lazy">`
     : '<span>Sem imagem</span>';
-  return `<article class="admin-property"><div class="admin-property-thumb">${thumbnail}</div><div class="admin-property-info"><span class="admin-property-type">${escapeHtml(typeLabel(item.tipo))} · Venda</span><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(location)} · ${formatMoney(item.preco)}</p></div><div class="admin-property-actions"><button class="quiet-button carousel-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Criar carrossel" title="Criar carrossel"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="15" height="15" rx="2"/><path d="m7 15 3-3 4 4 2-2 2 2"/><path d="M7 9h.01"/><path d="M8 2h11a3 3 0 0 1 3 3v11"/></svg></button><button class="quiet-button edit-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Editar imóvel" title="Editar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button><button class="quiet-button archive-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Arquivar imóvel" title="Arquivar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M5 7l1 14h12l1-14"/><path d="M9 11v6M15 11v6"/><path d="M8 7V3h8v4"/></svg></button></div></article>`;
+  const saleSummary = item.vendido && item.venda ? `<small class="sold-summary">Vendido em ${escapeHtml(item.venda.data_venda)} por ${formatMoney(item.venda.valor_venda)}</small>` : '';
+  const soldAction = item.vendido ? '' : `<button class="quiet-button sold-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Marcar imóvel como vendido" title="Marcar como vendido"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></button>`;
+  const mutableActions = item.vendido ? '' : `<button class="quiet-button edit-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Editar imóvel" title="Editar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>${soldAction}<button class="quiet-button archive-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Arquivar imóvel" title="Arquivar imóvel"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M5 7l1 14h12l1-14"/><path d="M9 11v6M15 11v6"/><path d="M8 7V3h8v4"/></svg></button>`;
+  return `<article class="admin-property ${item.vendido ? 'is-sold' : ''}"><div class="admin-property-thumb">${thumbnail}${item.vendido ? '<span class="sold-badge">Vendido</span>' : ''}</div><div class="admin-property-info"><span class="admin-property-type">${escapeHtml(typeLabel(item.tipo))} · ${item.vendido ? 'Vendido' : 'Venda'}</span><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(location)} · ${formatMoney(item.preco)}</p>${saleSummary}</div><div class="admin-property-actions"><button class="quiet-button carousel-property" data-id="${escapeHtml(item._id)}" type="button" aria-label="Criar carrossel" title="Criar carrossel"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="15" height="15" rx="2"/><path d="m7 15 3-3 4 4 2-2 2 2"/><path d="M7 9h.01"/><path d="M8 2h11a3 3 0 0 1 3 3v11"/></svg></button>${mutableActions}</div></article>`;
 }
 
 function renderLivePreview() {
@@ -214,10 +338,53 @@ function refreshProperties() {
   properties = readProperties();
   const keyword = normalizeSearch(propertyFilter?.value || '');
   const active = properties.filter(item => item.status !== 'arquivado');
-  const filtered = keyword ? active.filter(item => searchableProperty(item).includes(keyword)) : active;
-  list.innerHTML = filtered.length
-    ? filtered.map(propertyCard).join('')
-    : `<div class="admin-empty">${keyword ? 'Nenhum imóvel encontrado para esta palavra-chave.' : 'Nenhum imóvel ativo nesta demonstração.'}</div>`;
+  updateNeighborhoodFilter(active);
+  const neighborhood = normalizeSearch(neighborhoodFilter?.value || '');
+  const minimumPrice = Number(priceMinFilter?.value) || 0;
+  const maximumPrice = Number(priceMaxFilter?.value) || Infinity;
+  const soldValue = soldFilter?.value || 'false';
+  const filtered = active.filter(item => {
+    const itemNeighborhood = normalizeSearch(item.localizacao?.bairro || '');
+    const price = Number(item.preco) || 0;
+    return (!keyword || searchableProperty(item).includes(keyword))
+      && (!neighborhood || itemNeighborhood.includes(neighborhood))
+      && price >= minimumPrice
+      && price <= maximumPrice
+      && (soldValue === 'all' || Boolean(item.vendido) === (soldValue === 'true'));
+  });
+  const hasFilters = Boolean(keyword || neighborhood || minimumPrice || maximumPrice !== Infinity || soldValue !== 'false');
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  currentPage = Math.min(currentPage, totalPages);
+  const pageItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  list.innerHTML = pageItems.length
+    ? pageItems.map(propertyCard).join('')
+    : `<div class="admin-empty">${hasFilters ? 'Nenhum imóvel encontrado com os filtros selecionados.' : 'Nenhum imóvel ativo nesta demonstração.'}</div>`;
+  renderPagination(filtered.length, totalPages);
+}
+
+function renderPagination(totalItems, totalPages) {
+  if (!totalItems) {
+    pagination.innerHTML = '';
+    return;
+  }
+  const firstItem = (currentPage - 1) * pageSize + 1;
+  const lastItem = Math.min(currentPage * pageSize, totalItems);
+  const pageButtons = Array.from({ length: totalPages }, (_, index) => index + 1)
+    .map(page => `<button type="button" data-page="${page}" class="${page === currentPage ? 'active' : ''}" aria-label="Ir para a página ${page}" ${page === currentPage ? 'aria-current="page"' : ''}>${page}</button>`).join('');
+  pagination.innerHTML = `<span>${firstItem}–${lastItem} de ${totalItems} imóveis</span><div><button type="button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>${pageButtons}<button type="button" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Próxima página">›</button></div>`;
+}
+
+function resetPageAndRefresh() {
+  currentPage = 1;
+  refreshProperties();
+}
+
+function updateNeighborhoodFilter(items) {
+  if (!neighborhoodOptions) return;
+  const neighborhoods = [...new Set(items.map(item => item.localizacao?.bairro).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  neighborhoodOptions.innerHTML = neighborhoods
+    .map(neighborhood => `<option value="${escapeHtml(neighborhood)}"></option>`).join('');
 }
 
 function normalizeSearch(value) {
@@ -257,7 +424,56 @@ photoInput?.addEventListener('change', () => {
 });
 document.querySelector('#cancel-edit')?.addEventListener('click', resetForm);
 document.querySelector('#close-property-editor')?.addEventListener('click', resetForm);
-editPropertyDialog?.addEventListener('click', event => { if (event.target === editPropertyDialog) resetForm(); });
+document.querySelector('#close-sale-dialog')?.addEventListener('click', closeSaleDialog);
+document.querySelector('#cancel-sale')?.addEventListener('click', closeSaleDialog);
+saleSeller?.addEventListener('change', updateSaleCommissionSummary);
+saleForm?.elements.valor_venda?.addEventListener('input', updateSaleCommissionSummary);
+saleForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const property = properties.find(item => String(item._id) === String(sellingId));
+  if (!property) return;
+  const data = new FormData(saleForm);
+  const seller = saleSellers.find(item => String(item.id) === String(data.get('vendedor_id')));
+  const agencyPercent = Number(property.percentual_comissao ?? 6);
+  const sellerPercent = Number(seller?.percentual_comissao || 0);
+  const captorPercent = Number(property.percentual_comissao_captador || 0);
+  const saleValue = Number(data.get('valor_venda'));
+  const sale = {
+    vendedor_id: String(data.get('vendedor_id') || ''),
+    vendedor_nome: seller?.nome || '',
+    valor_venda: saleValue,
+    data_venda: data.get('data_venda'),
+    nome_do_cliente: String(data.get('nome_do_cliente') || '').trim(),
+    percentual_comissao_imobiliaria: agencyPercent,
+    percentual_comissao_vendedor: sellerPercent,
+    comissao_imobiliaria: saleValue * agencyPercent / 100,
+    comissao_vendedor: saleValue * agencyPercent / 100 * sellerPercent / 100,
+    captador_id: property.captador_id || '',
+    captador_nome: property.captador_nome || '',
+    percentual_comissao_captador: captorPercent,
+    comissao_captador: saleValue * agencyPercent / 100 * captorPercent / 100,
+    comissao_liquida_imobiliaria: saleValue * agencyPercent / 100 - saleValue * agencyPercent / 100 * sellerPercent / 100 - saleValue * agencyPercent / 100 * captorPercent / 100
+  };
+  const submit = saleForm.querySelector('button[type="submit"]');
+  const saleMessage = document.querySelector('#sale-form-message');
+  submit.disabled = true;
+  try {
+    if (!seller) throw new Error('Selecione um vendedor ativo para concluir a venda.');
+    if (sale.comissao_liquida_imobiliaria < 0) throw new Error('As comissões do vendedor e do captador ultrapassam a comissão da imobiliária.');
+    await syncSaleWithApi(property._id, { vendedor_id: sale.vendedor_id, valor_venda: sale.valor_venda, data_venda: sale.data_venda, nome_do_cliente: sale.nome_do_cliente });
+    property.vendido = true;
+    property.venda = sale;
+    property.status = 'vendido';
+    property.atualizado_em = new Date().toISOString();
+    saveProperties();
+    closeSaleDialog();
+    currentPage = 1;
+    refreshProperties();
+  } catch (error) {
+    saleMessage.textContent = error.message;
+    saleMessage.classList.add('error');
+  } finally { submit.disabled = false; }
+});
 livePreview?.addEventListener('click', event => {
   const thumbnail = event.target.closest('[data-live-gallery-index]');
   const stepButton = event.target.closest('[data-live-gallery-step]');
@@ -270,9 +486,27 @@ livePreview?.addEventListener('click', event => {
 });
 document.querySelector('#refresh-list').addEventListener('click', refreshProperties);
 document.querySelector('#add-property')?.addEventListener('click', startCreate);
-propertyFilter?.addEventListener('input', refreshProperties);
+propertyFilter?.addEventListener('input', resetPageAndRefresh);
+neighborhoodFilter?.addEventListener('input', resetPageAndRefresh);
+priceMinFilter?.addEventListener('input', resetPageAndRefresh);
+priceMaxFilter?.addEventListener('input', resetPageAndRefresh);
+soldFilter?.addEventListener('change', resetPageAndRefresh);
+document.querySelector('#clear-admin-filters')?.addEventListener('click', () => {
+  propertyFilter.value = '';
+  neighborhoodFilter.value = '';
+  priceMinFilter.value = '';
+  priceMaxFilter.value = '';
+  soldFilter.value = 'false';
+  resetPageAndRefresh();
+});
+pagination.addEventListener('click', event => {
+  const button = event.target.closest('[data-page]');
+  if (!button || button.disabled) return;
+  currentPage = Number(button.dataset.page);
+  refreshProperties();
+  list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 document.querySelector('#close-carousel').addEventListener('click', () => carouselDialog.close());
-carouselDialog.addEventListener('click', event => { if (event.target === carouselDialog) carouselDialog.close(); });
 document.querySelector('#carousel-previous').addEventListener('click', () => showCarouselSlide(carouselSlideIndex - 1));
 document.querySelector('#carousel-next').addEventListener('click', () => showCarouselSlide(carouselSlideIndex + 1));
 document.querySelector('#download-carousel-slide').addEventListener('click', downloadCarouselSlide);
@@ -343,9 +577,9 @@ form?.addEventListener('submit', async event => {
     if (editingId) {
       const index = properties.findIndex(property => String(property._id) === String(editingId));
       if (index < 0) throw new Error('Imóvel não encontrado nesta demonstração.');
-      properties[index] = { ...properties[index], ...prepared, status: 'ativo' };
+      properties[index] = { ...properties[index], ...prepared, status: 'ativo', atualizado_em: new Date().toISOString() };
     } else {
-      properties.unshift({ ...prepared, _id: `demo-${Date.now()}`, status: 'ativo' });
+      properties.unshift({ ...prepared, _id: `demo-${Date.now()}`, status: 'ativo', vendido: false, venda: null, criado_em: new Date().toISOString(), atualizado_em: new Date().toISOString() });
     }
     saveProperties();
     const successMessage = editingId ? 'Alterações salvas.' : 'Imóvel cadastrado.';
@@ -370,6 +604,12 @@ list.addEventListener('click', async event => {
   if (carouselButton) {
     const item = properties.find(property => String(property._id) === carouselButton.dataset.id);
     if (item) await openCarousel(item);
+    return;
+  }
+  const soldButton = event.target.closest('.sold-property');
+  if (soldButton) {
+    const item = properties.find(property => String(property._id) === soldButton.dataset.id);
+    if (item) openSaleDialog(item);
     return;
   }
   const archiveButton = event.target.closest('.archive-property');

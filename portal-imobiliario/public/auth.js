@@ -48,9 +48,7 @@ function setFieldInvalid(input, isInvalid) {
 }
 
 function resolveNextUrl() {
-  const next = new URLSearchParams(window.location.search).get('next') || '';
-  if (next.startsWith('/') && !next.startsWith('//')) return next;
-  return '/admin.html';
+  return '/dashboard.html';
 }
 
 function validateLoginInputs(form) {

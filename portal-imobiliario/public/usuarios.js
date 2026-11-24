@@ -125,6 +125,5 @@ document.querySelector('#add-user').addEventListener('click', openCreateUser);
 document.querySelector('#refresh-users').addEventListener('click', loadUsers);
 document.querySelector('#close-user-dialog').addEventListener('click', closeUserDialog);
 document.querySelector('#cancel-user').addEventListener('click', closeUserDialog);
-userDialog.addEventListener('click', event => { if (event.target === userDialog) closeUserDialog(); });
 userFilter.addEventListener('input', renderUsers);
 loadUsers();

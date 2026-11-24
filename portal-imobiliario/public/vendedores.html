@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf1e9">
+  <title>Gestão de vendedores — Bartarin Imóveis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=brand-5">
+</head>
+<body class="admin-protected">
+  <header class="topbar"><a class="brand" href="/dashboard.html"><img class="brand-logo" src="images/logo.png?v=brand-3" alt="Logo Bartarin"></a><nav class="nav-links"><a href="/dashboard.html">Dashboard</a><a href="/admin.html">Imóveis</a><a class="active" href="/vendedores.html">Vendedores</a><details class="nav-dropdown"><summary>Relatórios</summary><div><a href="/relatorio-comissoes.html">Comissões</a><a href="/relatorio-vendas.html">Vendas</a></div></details><a href="/usuarios.html">Usuários</a></nav><div class="admin-header-actions"><div class="admin-user-menu" data-admin-user-menu><button class="admin-user-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span data-admin-user-name>Usuário</span><svg class="menu-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg><svg class="admin-user-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button><div class="admin-user-dropdown" hidden><button type="button" data-change-password>Alterar senha</button><button type="button" data-admin-logout>Sair</button></div></div></div></header>
+  <main class="admin-page users-page">
+    <section class="admin-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> EQUIPE COMERCIAL</div><h1>Gerencie seus <em>vendedores.</em></h1><p>Cadastre a equipe e defina a participação de cada vendedor na comissão da imobiliária.</p></div><span class="connection-pill" id="sellers-connection-status">Verificando API</span></section>
+    <div class="admin-layout"><section class="admin-panel listing-panel"><div class="panel-heading"><div><span class="panel-kicker">VENDEDORES</span><h2>Vendedores cadastrados</h2></div><div class="catalog-tools"><label class="catalog-filter"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="seller-filter" type="search" placeholder="Filtrar por palavra-chave" aria-label="Filtrar vendedores"></label><button id="refresh-sellers" class="button refresh-button" type="button">Atualizar <span>↻</span></button><button id="add-seller" class="button add-property-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar</button></div></div><div id="seller-list" class="admin-property-list"><div class="admin-empty">Carregando vendedores…</div></div></section></div>
+  </main>
+  <dialog id="seller-dialog" class="user-dialog">
+    <div class="edit-workspace-heading"><div><span class="panel-kicker">CADASTRO DE VENDEDOR</span><h2 id="seller-form-title">Novo vendedor</h2></div><button class="quiet-button" id="close-seller-dialog" type="button">Fechar ✕</button></div>
+    <form id="seller-form" class="user-form">
+      <label>Nome completo<input name="nome" required minlength="2" maxlength="120" placeholder="Nome do vendedor"></label>
+      <label>E-mail<input name="email" required type="email" placeholder="vendedor@email.com"></label>
+      <label>Telefone<input name="telefone" maxlength="30" placeholder="(19) 99999-9999"></label>
+      <label>CRECI<input name="creci" maxlength="40" placeholder="CRECI 000000-F"></label>
+      <label>Comissão do vendedor (%)<input name="percentual_comissao" required type="number" min="0" max="100" step="0.01" value="50"></label>
+      <label class="check-field"><input name="ativo" type="checkbox" checked><span>Vendedor ativo</span></label>
+      <small class="wide">A porcentagem do vendedor é aplicada sobre a comissão recebida pela imobiliária, não diretamente sobre o valor do imóvel.</small>
+      <div class="form-actions wide"><p class="form-message" id="seller-form-message" aria-live="polite"></p><div><button class="button button-outline" id="cancel-seller" type="button">Cancelar</button><button class="button button-dark" type="submit"><span id="seller-submit-label">Cadastrar vendedor</span><b>↗</b></button></div></div>
+    </form>
+  </dialog>
+  <script src="/admin-auth.js?v=2" defer></script><script src="/vendedores.js" defer></script>
+</body>
+</html>

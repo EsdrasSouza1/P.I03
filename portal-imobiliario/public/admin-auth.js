@@ -130,3 +130,14 @@ passwordForm.addEventListener('submit', async event => {
     message.classList.add('error');
   } finally { submit.disabled = false; }
 });
+
+const reportMenus = [...document.querySelectorAll('.nav-dropdown')];
+reportMenus.forEach(menu => {
+  menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => menu.removeAttribute('open')));
+});
+document.addEventListener('click', event => {
+  reportMenus.forEach(menu => { if (!menu.contains(event.target)) menu.removeAttribute('open'); });
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') reportMenus.forEach(menu => menu.removeAttribute('open'));
+});

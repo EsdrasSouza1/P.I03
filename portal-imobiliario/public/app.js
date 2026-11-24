@@ -59,7 +59,7 @@ function migrateRemotePhotos(items) {
 
 function populateNeighborhoods() {
   const neighborhoods = [...new Set(catalogProperties()
-    .filter(item => normalize(item.localizacao?.cidade) === 'araras' && item.status !== 'arquivado')
+    .filter(item => normalize(item.localizacao?.cidade) === 'araras' && item.status !== 'arquivado' && !item.vendido)
     .map(item => item.localizacao?.bairro)
     .filter(Boolean))]
     .sort((left, right) => left.localeCompare(right, 'pt-BR'));
@@ -189,7 +189,7 @@ function renderPropertyPage() {
 }
 
 function loadProperties(params = {}) {
-  properties = filterDemo(catalogProperties().filter(item => item.status !== 'arquivado'), params);
+  properties = filterDemo(catalogProperties().filter(item => item.status !== 'arquivado' && !item.vendido), params);
   const indicator = document.querySelector('#catalogue-note');
   if (indicator) indicator.hidden = false;
   if (favoritesOnly) properties = properties.filter(item => favorites.has(String(item._id)));
@@ -286,7 +286,6 @@ grid.addEventListener('keydown', event => {
 });
 
 detailsDialog.addEventListener('click', event => {
-  if (event.target === detailsDialog) detailsDialog.close();
   if (event.target.closest('[data-image-zoom]') || event.target.matches('#gallery-main-image')) openImageViewer();
   const thumbnail = event.target.closest('[data-gallery-index]');
   if (thumbnail) updateGallery(Number(thumbnail.dataset.galleryIndex));
@@ -294,7 +293,7 @@ detailsDialog.addEventListener('click', event => {
   if (step) updateGallery(activeGalleryIndex + Number(step.dataset.galleryStep));
 });
 imageViewer.addEventListener('click', event => {
-  if (event.target === imageViewer || event.target.closest('[data-image-close]')) imageViewer.close();
+  if (event.target.closest('[data-image-close]')) imageViewer.close();
   const step = event.target.closest('[data-image-step]');
   if (step) updateGallery(activeGalleryIndex + Number(step.dataset.imageStep));
 });
@@ -311,7 +310,6 @@ document.querySelectorAll('#open-lead, #open-lead-2').forEach(button => button.a
   leadDialog.showModal();
 }));
 leadDialog.querySelector('.dialog-close button').addEventListener('click', () => leadDialog.close());
-leadDialog.addEventListener('click', event => { if (event.target === leadDialog) leadDialog.close(); });
 document.querySelector('#lead-form').addEventListener('submit', event => {
   event.preventDefault();
   const form = event.currentTarget;
