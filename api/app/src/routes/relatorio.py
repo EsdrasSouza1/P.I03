@@ -4,6 +4,7 @@ from uuid import uuid4
 from flask import Blueprint, jsonify, request
 
 from app.src.models import Imovel
+from app.src.routes.login import autenticacao_obrigatoria
 
 
 relatorio_bp = Blueprint("relatorio", __name__, url_prefix="/relatorios")
@@ -21,6 +22,7 @@ def _periodo_query():
 
 
 @relatorio_bp.get("/comissoes")
+@autenticacao_obrigatoria
 def relatorio_comissoes():
     try:
         vendedor_id = request.args.get("vendedor_id")
@@ -54,6 +56,7 @@ def relatorio_comissoes():
 
 
 @relatorio_bp.post("/comissoes/pagar")
+@autenticacao_obrigatoria
 def pagar_comissoes():
     dados = request.get_json(silent=True) or {}
     itens = dados.get("itens") or []
@@ -85,6 +88,7 @@ def pagar_comissoes():
 
 
 @relatorio_bp.get("/vendas")
+@autenticacao_obrigatoria
 def relatorio_vendas():
     try:
         vendedor_id = request.args.get("vendedor_id")

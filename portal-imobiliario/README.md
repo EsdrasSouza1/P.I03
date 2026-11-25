@@ -1,91 +1,124 @@
-# Bartarin Imóveis — Protótipo de frontend
+# Bartarin Imóveis
 
-> Projeto acadêmico para um portal imobiliário e CRM de leads no contexto da Bartarin Imóveis, em Araras, SP. O frontend fica nesta pasta; a API Flask e o suporte a MongoDB estão em `../api`.
+Portal imobiliário com área administrativa para gestão de imóveis, vendedores, usuários, vendas, comissões e relatórios. O frontend está nesta pasta e a API Flask com MongoDB fica em [`../api`](../api).
 
-## O que dá para demonstrar
+## Funcionalidades
 
-- portal imobiliário responsivo com 79 anúncios de venda, consultados em 23/11/2026;
-- busca por tipo, bairro de Araras, quantidade mínima de dormitórios e faixa de preço;
-- detalhes de imóvel com fotos locais da galeria correspondente, descrição do anúncio e mapa aproximado do bairro;
-- favoritos salvos no `localStorage` do navegador;
-- tela de gestão de imóveis com cadastro, edição e arquivamento simulados no `localStorage`;
-- cadastro com até 8 fotos compactadas no navegador e criador de carrossel para Instagram (artes 4:5 em PNG);
-- telas visuais de login, cadastro de cliente e recuperação de senha;
-- painel CRM com leads fictícios, filtros, etapas e histórico demonstrativos;
-- identidade visual em verde sálvia, off-white e tons neutros.
+### Portal público
+
+- catálogo responsivo, filtros e apresentação completa dos imóveis;
+- galeria de fotos e favoritos no navegador;
+- política de privacidade e política de cookies;
+- aceite, recusa e personalização de cookies opcionais.
+
+### Área administrativa
+
+- autenticação conectada à API e Dashboard como página inicial;
+- cadastro, edição, pré-visualização, filtros e paginação de imóveis;
+- cadastro de vendedores, usuários e percentuais de comissão;
+- vínculo do vendedor captador ao imóvel;
+- registro de venda com comprador, valor, data e vendedor;
+- cálculo das comissões da imobiliária, vendedor e captador;
+- bloqueio da edição de imóveis vendidos;
+- relatórios de vendas e comissões por período e vendedor;
+- pagamento individual ou agrupado de comissões;
+- comprovante de pagamento para impressão.
 
 ## Tecnologias
 
-- **Frontend:** HTML, CSS e JavaScript.
-- **Armazenamento demonstrativo:** `localStorage` do navegador para favoritos, catálogo de demonstração e CRM.
-- **API opcional:** Flask e MongoDB, documentados em [`../api/README.md`](../api/README.md).
-- **Pré-visualização:** Node.js com módulos nativos para servir o frontend; imagens fotográficas ficam em `public/images`.
-
-O frontend não tem dependências npm de aplicação. Para usar login, usuários e imóveis pela API, configure Python, MongoDB e o arquivo `.env` conforme a documentação da API.
-
-## Abrir o projeto
-
-### Opção 1: servidor estático incluído
-
-Requer Node.js 20 ou posterior. No terminal, dentro da pasta `portal-imobiliario`:
-
-```bash
-npm start
-```
-
-Depois, abra <http://localhost:3000>.
-
-### Opção 2: VS Code Live Server
-
-Abra `public/index.html` com a extensão Live Server. As imagens demonstrativas já estão no projeto e funcionam com o Live Server. Para testar as outras telas, navegue pelas URLs abaixo:
-
-- Portal: `/`
-- Gestão demonstrativa: `/admin.html`
-- Login: `/login.html`
-- Cadastro: `/cadastro.html`
-- Recuperação de senha: `/recuperar-senha.html`
-- CRM: `/crm.html`
-
-## Como os dados de demonstração funcionam
-
-Os anúncios do catálogo e os leads de demonstração são definidos em `public/data.js`. As galerias dos imóveis foram baixadas para `public/images/imoveis/`, com um manifesto que relaciona cada foto ao anúncio de origem. O logo local está em `public/images/logo.png`. Fotos enviadas no painel continuam no armazenamento local do navegador; a ficha inclui descrição, galeria e link para o anúncio original.
-
-Login, criação de conta e recuperação de senha são somente telas. Não digite senhas reais: esses formulários não autenticam ninguém e não devem armazenar credenciais. O formulário público de contato também não envia nem guarda os dados informados.
-
-O catálogo contém 79 anúncios públicos consultados em 23/11/2026, com descrição, preço, ficha e fotos locais associadas. A pasta `public/images/imoveis/` tem 1.348 fotos sem duplicatas exatas (cerca de 65 MB); o catálogo carrega as imagens sob demanda. Preços e disponibilidade podem mudar; confirme os dados no anúncio original. Os contatos do CRM continuam fictícios.
+- HTML, CSS e JavaScript sem framework;
+- Node.js como servidor estático de desenvolvimento;
+- Python e Flask;
+- MongoEngine e MongoDB;
+- sessões Flask e hash de senhas do Werkzeug.
 
 ## Estrutura
 
 ```text
-portal-imobiliario/
-├── public/
-│   ├── admin.html / admin.js       # gestão local demonstrativa de imóveis
-│   ├── auth.js                     # interações das telas de acesso
-│   ├── cadastro.html               # cadastro visual
-│   ├── crm.html / crm.js            # painel CRM de demonstração
-│   ├── data.js                     # anúncios da imobiliária e dados de demonstração
-│   ├── index.html / app.js          # portal, filtros, detalhes e favoritos
-│   ├── login.html                  # login conectado à API
-│   ├── recuperar-senha.html         # tela de recuperação visual
-│   ├── styles.css                   # estilos compartilhados
-│   └── images/                      # fotos locais dos imoveis e logo
-├── package.json                    # comando opcional para pré-visualizar
-├── server.js                       # servidor estático local
-└── PLANO_DO_PROJETO.md             # escopo e checklist do protótipo
+P.I03/
+├── api/                              # API Flask e MongoDB
+└── portal-imobiliario/
+    ├── public/
+    │   ├── index.html                # portal público
+    │   ├── login.html                # autenticação
+    │   ├── dashboard.html            # início administrativo
+    │   ├── admin.html                # imóveis
+    │   ├── vendedores.html           # vendedores
+    │   ├── usuarios.html             # usuários
+    │   ├── relatorio-vendas.html
+    │   ├── relatorio-comissoes.html
+    │   ├── politica-privacidade.html
+    │   ├── politica-cookies.html
+    │   └── images/
+    ├── server.js
+    └── package.json
 ```
 
-## Limites do protótipo
+## Requisitos
 
-- os dados no `localStorage` existem apenas naquele navegador e podem ser apagados;
-- não há usuários, autenticação, autorização ou envio de e-mail;
-- não há persistência compartilhada nem sincronização entre dispositivos;
-- o CRM usa contatos fictícios e não recebe os formulários do portal;
-- as galerias dos imoveis e o logo sao arquivos locais do projeto;
-- as fotos e alterações criadas no painel ficam no `localStorage` daquele navegador e estão sujeitas ao limite de armazenamento do navegador;
-- a API requer configuração própria de Python, MongoDB e variáveis de ambiente antes do uso.
+- Node.js 20 ou superior;
+- Python 3.11 ou superior;
+- MongoDB local ou MongoDB Atlas.
 
-O backend opcional está em `../api`; siga [`../api/README.md`](../api/README.md) para configurar MongoDB e iniciar a API.
+## Executar
 
-## Próximos passos de frontend
+### API
 
-O checklist está em [PLANO_DO_PROJETO.md](./PLANO_DO_PROJETO.md). Para executar o backend, consulte [`../api/README.md`](../api/README.md).
+Consulte [`../api/README.md`](../api/README.md). Resumo para PowerShell:
+
+```powershell
+cd ..\api
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+python run.py
+```
+
+A API ficará em `http://127.0.0.1:5000`.
+
+### Frontend
+
+Em outro terminal:
+
+```powershell
+cd portal-imobiliario
+npm start
+```
+
+Abra `http://localhost:3000`. O acesso administrativo começa em `/login.html` e direciona para `/dashboard.html` após o login.
+
+## Segurança
+
+- endpoints administrativos protegidos na API;
+- limitação de tentativas de login;
+- senhas armazenadas somente como hash;
+- cookies de sessão com `HttpOnly` e `SameSite=Lax`;
+- CORS limitado às origens configuradas;
+- CSP, proteção contra enquadramento e MIME sniffing;
+- limite do tamanho das requisições;
+- cookies opcionais desativados antes da autorização.
+
+Em produção, use HTTPS, configure `COOKIE_SECURE=true`, substitua a chave secreta de exemplo e nunca envie o `.env` ao Git.
+
+## Persistência atual
+
+Usuários, vendedores e registros disponibilizados pela API ficam no MongoDB. O catálogo demonstrativo e as fotos adicionadas pelo painel ainda utilizam `localStorage`. Os relatórios consolidam as vendas locais com as disponíveis na API.
+
+Antes do uso real, imóveis, fotos, vendas e pagamentos devem ser integralmente migrados para o backend. O navegador não deve ser a fonte oficial de informações financeiras.
+
+## Privacidade
+
+Antes da publicação, complete as políticas com:
+
+- identificação do controlador;
+- canal de atendimento aos titulares;
+- fornecedores externos;
+- prazos reais de retenção;
+- bases legais de cada tratamento.
+
+## Documentação adicional
+
+- [README da API](../api/README.md)
+- [Documentação da API e banco](DOCUMENTACAO_API_BANCO.md)
+- [Plano do projeto](PLANO_DO_PROJETO.md)

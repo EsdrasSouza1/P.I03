@@ -1,5 +1,9 @@
 from email_validator import EmailNotValidError, validate_email
-from flask import Blueprint, current_app, jsonify, request, session
+from collections import defaultdict, deque
+from functools import wraps
+from time import time
+
+from flask import Blueprint, current_app, g, jsonify, request, session
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from mongoengine.errors import DoesNotExist, ValidationError
 from werkzeug.security import check_password_hash
@@ -7,6 +11,7 @@ from werkzeug.security import check_password_hash
 from app.src.models import Usuario
 
 login_bp = Blueprint("login", __name__)
+_tentativas_login = defaultdict(deque)
 
 
 def _token_serializer() -> URLSafeTimedSerializer:
@@ -43,6 +48,36 @@ def _extrair_usuario_id_da_requisicao():
     return None
 
 
+def autenticacao_obrigatoria(funcao):
+    @wraps(funcao)
+    def protegida(*args, **kwargs):
+        usuario_id = _extrair_usuario_id_da_requisicao()
+        if not usuario_id:
+            return jsonify({"erro": "Autenticação obrigatória."}), 401
+        try:
+            g.usuario_atual = Usuario.objects.get(id=usuario_id)
+        except (DoesNotExist, ValidationError):
+            session.clear()
+            return jsonify({"erro": "Sessão inválida ou expirada."}), 401
+        return funcao(*args, **kwargs)
+    return protegida
+
+
+def _limite_login_excedido(identificador: str) -> bool:
+    chave = f"{request.remote_addr}:{identificador.lower()}"
+    agora = time()
+    tentativas = _tentativas_login[chave]
+    while tentativas and tentativas[0] < agora - 900:
+        tentativas.popleft()
+    if len(tentativas) >= 8:
+        return True
+    return False
+
+
+def _registrar_falha_login(identificador: str) -> None:
+    _tentativas_login[f"{request.remote_addr}:{identificador.lower()}"].append(time())
+
+
 @login_bp.route("/login", methods=["POST"], strict_slashes=False)
 def login():
     dados = request.get_json(silent=True)
@@ -63,6 +98,9 @@ def login():
     if not identificador or not isinstance(senha, str) or not senha:
         return jsonify({"erro": "E-mail/usuário e senha são obrigatórios."}), 400
 
+    if _limite_login_excedido(identificador):
+        return jsonify({"erro": "Muitas tentativas de acesso. Aguarde alguns minutos."}), 429
+
     if email is not None or "@" in identificador:
         try:
             email_normalizado = validate_email(identificador, check_deliverability=False).normalized
@@ -76,9 +114,11 @@ def login():
     )
 
     if not usuario or not check_password_hash(usuario.senha, senha):
+        _registrar_falha_login(identificador)
         return jsonify({"erro": "E-mail ou senha inválidos."}), 401
 
     usuario_id = str(usuario.id)
+    session.clear()
     session["usuario_id"] = usuario_id
     session.permanent = lembrar
 

@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from mongoengine.errors import DoesNotExist, NotUniqueError, ValidationError
 
 from app.src.models.vendedor import Vendedor
+from app.src.routes.login import autenticacao_obrigatoria
 
 vendedor_bp = Blueprint("vendedor", __name__, url_prefix="/vendedores")
 
@@ -21,6 +22,7 @@ def _buscar_vendedor(vendedor_id):
 
 
 @vendedor_bp.get("")
+@autenticacao_obrigatoria
 def listar_vendedores():
     query = Vendedor.objects
     ativo = request.args.get("ativo")
@@ -30,6 +32,7 @@ def listar_vendedores():
 
 
 @vendedor_bp.post("")
+@autenticacao_obrigatoria
 def criar_vendedor():
     dados = request.get_json(silent=True) or {}
     obrigatorios = ["nome", "email", "percentual_comissao"]
@@ -46,6 +49,7 @@ def criar_vendedor():
 
 
 @vendedor_bp.route("/<vendedor_id>", methods=["PUT", "PATCH"])
+@autenticacao_obrigatoria
 def atualizar_vendedor(vendedor_id):
     vendedor, erro = _buscar_vendedor(vendedor_id)
     if erro:
@@ -67,6 +71,7 @@ def atualizar_vendedor(vendedor_id):
 
 
 @vendedor_bp.delete("/<vendedor_id>")
+@autenticacao_obrigatoria
 def desativar_vendedor(vendedor_id):
     vendedor, erro = _buscar_vendedor(vendedor_id)
     if erro:

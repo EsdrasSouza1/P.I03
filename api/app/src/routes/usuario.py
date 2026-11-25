@@ -5,6 +5,7 @@ from mongoengine.errors import DoesNotExist, NotUniqueError, ValidationError
 from werkzeug.security import generate_password_hash
 
 from app.src.models import Usuario
+from app.src.routes.login import autenticacao_obrigatoria
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
 
@@ -23,12 +24,14 @@ def _buscar_usuario_por_id(usuario_id: str):
 
 
 @usuario_bp.route("", methods=["GET"], strict_slashes=False)
+@autenticacao_obrigatoria
 def listar_usuarios():
     usuarios = Usuario.objects.all()
     return jsonify([u.to_dict() for u in usuarios]), 200
 
 
 @usuario_bp.route("/<usuario_id>", methods=["GET"], strict_slashes=False)
+@autenticacao_obrigatoria
 def obter_usuario(usuario_id: str):
     usuario, erro = _buscar_usuario_por_id(usuario_id)
     if erro:
@@ -38,6 +41,7 @@ def obter_usuario(usuario_id: str):
 
 
 @usuario_bp.route("", methods=["POST"], strict_slashes=False)
+@autenticacao_obrigatoria
 def criar_usuario():
     dados = request.get_json(silent=True) or {}
 
@@ -64,6 +68,7 @@ def criar_usuario():
 
 
 @usuario_bp.route("/<usuario_id>", methods=["PUT", "PATCH"], strict_slashes=False)
+@autenticacao_obrigatoria
 def atualizar_usuario(usuario_id: str):
     usuario, erro = _buscar_usuario_por_id(usuario_id)
     if erro:
@@ -92,6 +97,7 @@ def atualizar_usuario(usuario_id: str):
 
 
 @usuario_bp.route("/<usuario_id>", methods=["DELETE"], strict_slashes=False)
+@autenticacao_obrigatoria
 def deletar_usuario(usuario_id: str):
     usuario, erro = _buscar_usuario_por_id(usuario_id)
     if erro:

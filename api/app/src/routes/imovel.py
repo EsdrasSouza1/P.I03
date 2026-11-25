@@ -7,6 +7,7 @@ from mongoengine.errors import DoesNotExist, ValidationError
 from app.src.models import Imovel
 from app.src.models.imovel import Venda
 from app.src.models.vendedor import Vendedor
+from app.src.routes.login import autenticacao_obrigatoria
 
 imovel_bp = Blueprint("imovel", __name__, url_prefix="/imoveis")
 
@@ -59,6 +60,7 @@ def obter_imovel(imovel_id: str):
 
 
 @imovel_bp.route("", methods=["POST"], strict_slashes=False)
+@autenticacao_obrigatoria
 def criar_imovel():
     dados = request.get_json(silent=True) or {}
 
@@ -125,6 +127,7 @@ def criar_imovel():
 
 
 @imovel_bp.route("/<imovel_id>", methods=["PUT", "PATCH"], strict_slashes=False)
+@autenticacao_obrigatoria
 def atualizar_imovel(imovel_id: str):
     imovel, erro = _buscar_imovel_por_id(imovel_id)
     if erro:
@@ -184,6 +187,7 @@ def atualizar_imovel(imovel_id: str):
 
 
 @imovel_bp.route("/<imovel_id>/venda", methods=["POST"], strict_slashes=False)
+@autenticacao_obrigatoria
 def registrar_venda(imovel_id: str):
     imovel, erro = _buscar_imovel_por_id(imovel_id)
     if erro:
@@ -238,6 +242,7 @@ def registrar_venda(imovel_id: str):
 
 
 @imovel_bp.route("/<imovel_id>", methods=["DELETE"], strict_slashes=False)
+@autenticacao_obrigatoria
 def deletar_imovel(imovel_id: str):
     imovel, erro = _buscar_imovel_por_id(imovel_id)
     if erro:
